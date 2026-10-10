@@ -60,6 +60,10 @@ python -m unittest discover -s tests -v
 
 ## Release Notes
 
+### v0.9.1 — *"Peace... Like a River (Update)"* (October 2026)
+- **Cover Art Gateway Resilience:** Added direct `/front` endpoint fallback and public high-res artwork resolution via Apple iTunes and Deezer when Internet Archive / Cover Art Archive experiences `502 Bad Gateway` outages.
+- **UI Typography Polish:** Fixed clipping and wrapping of nostalgic memory vignettes in the ripping progress ticker.
+
 ### v0.9.0 — *"Peace... Like a River"* (October 2026)
 > *This is the initial release of Lazy CD Ripper. Opinionated AF way to extract music from your CDs. Zero choices to make because the defaults are great! It works, I've tested it on quite a bunch of my music discs already. I will use it for some more time (and will share with friends) before releasing 1.0. Some minor polishing is likely to be done.*
 

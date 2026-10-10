@@ -109,8 +109,8 @@ class TestGuiThemeAndContent(unittest.TestCase):
             self.assertEqual(view.headline.text(), "Extracting Track 2 of 10...")
             self.assertEqual(view.track_label.text(), "Extracting")
             self.assertEqual(view.status_sub.text(), "Reading optical sectors  •  14.2x")
-            self.assertEqual(view.memory_card.maximumHeight(), 58)
-            self.assertEqual(view.memory_card.minimumHeight(), 58)
+            self.assertEqual(view.memory_card.maximumHeight(), 72)
+            self.assertEqual(view.memory_card.minimumHeight(), 72)
 
         self.assertEqual(view.MEMORY_ROTATION_INTERVAL_MS, 90000)
 
