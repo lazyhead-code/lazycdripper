@@ -4,9 +4,13 @@
   <img src="assets/images/screenshot.png" alt="Lazy CD Ripper Interface" width="640" />
 </p>
 
-The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just press the button!
-Download the latest portable release archive from **[GitHub Releases](https://github.com/lazyhead-code/lazycdripper/releases)**.
+---
 
+**Download the latest portable release archive from** **[GitHub Releases](https://github.com/lazyhead-code/lazycdripper/releases)**.
+
+---
+
+The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just press the button!
 - **Both Formats in One Pass:** Never choose between archival quality and mobile convenience. You always get both:
   - **FLAC (Level 8):** Bit-perfect Red Book (16-bit / 44.1 kHz) lossless master.
   - **AAC (256k VBR):** Ready for phones and Bluetooth headphones (native AAC-LC playback avoids lossy cross-codec re-compression).
