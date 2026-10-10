@@ -21,6 +21,7 @@ try:
         QHBoxLayout,
         QLabel,
         QProgressBar,
+        QSizePolicy,
         QVBoxLayout,
         QWidget,
     )
@@ -28,6 +29,7 @@ try:
 except ImportError:
     HAVE_QT = False
     QWidget = object
+    QSizePolicy = object
 
 
 class HiFiOpticalTransportWidget(QWidget if HAVE_QT else object):
@@ -364,18 +366,18 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.memory_card.setObjectName("previewCard")
         self.memory_card.setMinimumWidth(640)
         self.memory_card.setMaximumWidth(760)
-        self.memory_card.setFixedHeight(58)
+        self.memory_card.setFixedHeight(72)
         self.memory_card.setStyleSheet("QFrame#previewCard { background-color: #16161C; border: 1px solid #2C2C34; border-radius: 8px; }")
         mem_layout = QHBoxLayout(self.memory_card)
-        mem_layout.setContentsMargins(16, 6, 16, 6)
-        if HAVE_QT:
-            mem_layout.setAlignment(Qt.AlignCenter)
+        mem_layout.setContentsMargins(20, 6, 20, 6)
 
         initial_text = self._shuffled_memories[0] if self._shuffled_memories else ""
         self.memory_label = QLabel(initial_text)
-        self.memory_label.setStyleSheet("color: #FFB366; font-size: 13px; font-style: italic; font-weight: 500;")
+        self.memory_label.setStyleSheet("color: #FFB366; font-size: 13px; font-style: italic; font-weight: 500; background: transparent;")
         self.memory_label.setAlignment(Qt.AlignCenter)
         self.memory_label.setWordWrap(True)
+        if HAVE_QT:
+            self.memory_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         mem_layout.addWidget(self.memory_label)
 
         main_layout.addWidget(self.memory_card)
