@@ -5,6 +5,7 @@
 </p>
 
 The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just press the button!
+Download the latest portable release archive from **[GitHub Releases](https://github.com/lazyhead-code/lazycdripper/releases)**.
 
 - **Both Formats in One Pass:** Never choose between archival quality and mobile convenience. You always get both:
   - **FLAC (Level 8):** Bit-perfect Red Book (16-bit / 44.1 kHz) lossless master.
@@ -29,32 +30,6 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 > 
 > Yours truly,  
 > **Lazyhead Code 💿**
-
----
-
-## Download & Getting Started
-
-### 📦 Standalone Portable Zip (Recommended)
-Download the latest portable release archive from **[GitHub Releases](https://github.com/lazyhead-code/lazycdripper/releases)**.
-- Standalone `.zip` with pre-bundled `ffmpeg.exe` and Python runtime.
-- Zero installation or system dependencies required. Extract the zip anywhere and run `LazyCDRipper.exe`.
-
-### 🐍 Run from Source (Development)
-Requirements: Windows 10 or 11 (64-bit), Python 3.10+, and an optical CD drive.
-```bash
-git clone https://github.com/lazyhead-code/lazycdripper.git
-cd lazycdripper
-
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e ".[dev]"
-
-# Launch
-lazycdripper
-
-# Run tests
-python -m unittest discover -s tests -v
-```
 
 ---
 
