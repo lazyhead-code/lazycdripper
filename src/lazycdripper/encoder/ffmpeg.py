@@ -85,6 +85,8 @@ class FFmpegEncoder:
                 [self.binary_path, "-encoders"],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=5,
             )
             self._has_fdk_aac = "libfdk_aac" in res.stdout
@@ -102,6 +104,8 @@ class FFmpegEncoder:
                 [self.binary_path, "-version"],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=3,
             )
             import re
@@ -119,6 +123,8 @@ class FFmpegEncoder:
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=120,
             )
             if res.returncode == 0:

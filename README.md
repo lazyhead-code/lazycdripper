@@ -12,8 +12,8 @@
 
 The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just press the button!
 - **Both Formats in One Pass:** Never choose between archival quality and mobile convenience. You always get both:
-  - **FLAC (Level 8):** Bit-perfect Red Book (16-bit / 44.1 kHz) lossless master.
-  - **AAC (256k VBR):** Ready for phones and Bluetooth headphones (native AAC-LC playback avoids lossy cross-codec re-compression).
+  - **FLAC Lossless (Perfect CD Copy):** Bit-perfect original CD (16-bit / 44.1 kHz) master with Level 8 archival compression and MD5 stream verification.
+  - **AAC Lossy (Compressed but Still Great):** High-bitrate Fraunhofer FDK-AAC (256k VBR in `.m4a`), ready for phones and native Bluetooth headphone listening without cross-codec transcode artifacts.
 - **Automatic Metadata & High-Res Artwork:** MusicBrainz disc ID lookup + canonical front covers from the Cover Art Archive embedded in every track, plus a companion `cover.jpg` for media servers.
 - **Sensible Organization:** Clean, zero-padded filenames in dedicated folders (`Artist - Album (Year) [FLAC]/` and `[AAC]/`).
 
@@ -38,6 +38,13 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 ---
 
 ## Release Notes
+
+### v0.9.2 — *"Peace... Like a River"* (October 2026)
+- **Real-Time Drive Speed:** Wired up dynamic sector-rate speed measurement (75 sectors/sec) in the Windows extraction engine, actively signaling drive read speed (`Reading disc  •  14.2x`).
+- **Telemetry Cleanup:** Removed obsolete 1990s "Jitter Align" telemetry badge in favor of clean, reassuring sector error and retry monitoring.
+- **Fidelity Terminology:** Simplified all "Red Book Audio" jargon to clear, everyday audiophile fidelity (`AUDIO CD • 16-BIT / 44.1 kHz`).
+- **Native In-Screen Completion:** Replaced the floating popup dialog with an elegant in-screen completion summary directly inside the ripping deck, displaying the bit-perfect verdict, defect diagnostics (if any), library folder paths with sizes, and single-click folder access.
+- **Windows Subprocess Unicode Fix:** Explicitly set UTF-8 stream encoding and fallback error replacement on all FFmpeg and drive subprocess readers, preventing Windows CP1252 charmap decode crashes on non-ASCII metadata.
 
 ### v0.9.1 — *"Peace... Like a River (Update)"* (October 2026)
 - **Cover Art Gateway Resilience:** Added direct `/front` endpoint fallback and public high-res artwork resolution via Apple iTunes and Deezer when Internet Archive / Cover Art Archive experiences `502 Bad Gateway` outages.

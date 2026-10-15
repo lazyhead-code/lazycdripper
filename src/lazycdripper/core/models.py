@@ -148,32 +148,47 @@ class AlbumRipReport:
         if self.overall_status == "failed" or (self.track_reports and self.successful_tracks_count == 0):
             return "🔴 Extraction Failed — Drive Read Error"
         elif self.is_perfect:
-            return "🟢 Bit-Perfect Pristine Rip"
+            return "🟢 Rip Complete"
         elif self.total_errors == 0:
             return "🟡 Recovered With Multi-Pass Correction"
         else:
             return "🔴 Surface Damage Detected"
 
     @property
+    def clean_headline(self) -> str:
+        """Headline status title text without emoji prefix."""
+        headline = self.summary_headline
+        for prefix in ("🔴 ", "🟢 ", "🟡 "):
+            if headline.startswith(prefix):
+                return headline[len(prefix):]
+        return headline
+
+    @property
     def human_readable_summary(self) -> str:
-        """Formatted human-readable explanation of rip results."""
+        """Formatted human-readable explanation of rip results as concise bullet points."""
+        mins = int(self.duration_seconds // 60)
+        secs = int(self.duration_seconds % 60)
+        time_part = f" ({mins}m {secs}s)" if self.duration_seconds > 0 else ""
+
         if self.overall_status == "failed" or (self.track_reports and self.successful_tracks_count == 0):
+            err_count = self.total_errors if self.total_errors > 0 else "hardware"
             return (
-                f"Failed to extract audio tracks from the optical disc. "
-                f"The optical drive encountered unrecoverable read errors ({self.total_errors} error(s))."
+                f"•  Failed to extract audio tracks from optical disc\n"
+                f"•  Drive encountered {err_count} unrecoverable read error(s)"
             )
         elif self.is_perfect:
             return (
-                f"All {self.total_tracks} tracks were extracted with 100% bit-perfect accuracy. "
-                f"No jitter or surface read errors detected."
+                f"•  Tracks Extracted: {self.successful_tracks_count}/{self.total_tracks}{time_part}\n"
+                f"•  100% bit-perfect accuracy (0 read errors)"
             )
         elif self.total_errors == 0:
             return (
-                f"Surface scratches detected on disc. cdparanoia multi-pass re-reads successfully "
-                f"corrected all {self.total_retries} problematic sectors with zero data loss."
+                f"•  Tracks Extracted: {self.successful_tracks_count}/{self.total_tracks}{time_part}\n"
+                f"•  Sector Retries: {self.total_retries} recovered with zero data loss"
             )
         else:
-            return (
-                f"Severe scratch damage detected: {self.total_errors} unrecoverable sector(s) "
-                f"had to be skipped or interpolated."
-            )
+            bullets = [f"•  Tracks Extracted: {self.successful_tracks_count}/{self.total_tracks}{time_part}"]
+            if self.total_retries > 0:
+                bullets.append(f"•  Sector Retries: {self.total_retries} recovered")
+            bullets.append(f"•  Unrecoverable Skips: {self.total_errors} sector(s)")
+            return "\n".join(bullets)

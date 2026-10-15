@@ -88,7 +88,7 @@ class TestGuiThemeAndContent(unittest.TestCase):
             app = QApplication.instance() or QApplication(["-platform", "offscreen"])
         view = RippingViewWidget()
         if hasattr(view, "spec_badge"):
-            self.assertEqual(view.spec_badge.text(), "RED BOOK AUDIO • 16-BIT / 44.1 kHz PCM")
+            self.assertEqual(view.spec_badge.text(), "AUDIO CD • 16-BIT / 44.1 kHz")
 
         prog = RipProgress(
             current_track=2,
@@ -106,9 +106,9 @@ class TestGuiThemeAndContent(unittest.TestCase):
             self.assertFalse(view.headline.wordWrap())
             self.assertFalse(view.status_sub.wordWrap())
             self.assertGreaterEqual(view.visual_frame.minimumWidth(), 600)
-            self.assertEqual(view.headline.text(), "Extracting Track 2 of 10...")
+            self.assertEqual(view.headline.text(), "Track 2 of 10")
             self.assertEqual(view.track_label.text(), "Extracting")
-            self.assertEqual(view.status_sub.text(), "Reading optical sectors  •  14.2x")
+            self.assertEqual(view.status_sub.text(), "Reading disc  •  14.2x")
             self.assertEqual(view.memory_card.maximumHeight(), 72)
             self.assertEqual(view.memory_card.minimumHeight(), 72)
 
@@ -124,9 +124,9 @@ class TestGuiThemeAndContent(unittest.TestCase):
         )
         view.update_progress(prog_encode)
         if hasattr(view, "headline"):
-            self.assertEqual(view.headline.text(), "Transcoding Track 2 of 10...")
+            self.assertEqual(view.headline.text(), "Track 2 of 10")
             self.assertEqual(view.track_label.text(), "Transcoding")
-            self.assertEqual(view.status_sub.text(), "Lossless FLAC + 256k AAC")
+            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + AAC")
 
         # Test tagging progress state
         prog_tag = RipProgress(
@@ -138,7 +138,7 @@ class TestGuiThemeAndContent(unittest.TestCase):
         )
         view.update_progress(prog_tag)
         if hasattr(view, "headline"):
-            self.assertEqual(view.headline.text(), "Tagging Track 2 of 10...")
+            self.assertEqual(view.headline.text(), "Track 2 of 10")
             self.assertEqual(view.track_label.text(), "Tagging")
             self.assertEqual(view.status_sub.text(), "Embedding metadata & cover art")
 
@@ -153,9 +153,9 @@ class TestGuiThemeAndContent(unittest.TestCase):
         )
         view.update_progress(prog_named)
         if hasattr(view, "headline"):
-            self.assertEqual(view.headline.text(), 'Extracting: "Something" (2 of 10)')
+            self.assertEqual(view.headline.text(), 'Track 2 of 10: "Something"')
             self.assertEqual(view.track_label.text(), "Extracting")
-            self.assertEqual(view.status_sub.text(), "Reading optical sectors")
+            self.assertEqual(view.status_sub.text(), "Reading disc...")
 
         # Test encoding and tagging with track title
         prog_named_enc = RipProgress(
@@ -168,9 +168,9 @@ class TestGuiThemeAndContent(unittest.TestCase):
         )
         view.update_progress(prog_named_enc)
         if hasattr(view, "headline"):
-            self.assertEqual(view.headline.text(), 'Transcoding: "Something" (2 of 10)')
+            self.assertEqual(view.headline.text(), 'Track 2 of 10: "Something"')
             self.assertEqual(view.track_label.text(), "Transcoding")
-            self.assertEqual(view.status_sub.text(), "Lossless FLAC + 256k AAC")
+            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + AAC")
 
         # Test track title resolution via AlbumInfo set_album
         from lazycdripper.core.models import AlbumInfo, TrackInfo
@@ -193,7 +193,7 @@ class TestGuiThemeAndContent(unittest.TestCase):
         )
         view.update_progress(prog_album_res)
         if hasattr(view, "headline"):
-            self.assertEqual(view.headline.text(), 'Extracting: "Come Together" (1 of 2)')
+            self.assertEqual(view.headline.text(), 'Track 1 of 2: "Come Together"')
             self.assertEqual(view.track_label.text(), "Extracting")
 
     def test_backdrop_artwork_pixmap(self):
@@ -467,7 +467,29 @@ class TestTrackTableWidget(unittest.TestCase):
             self.assertIn("Mode 5", text)
             self.assertIn("Level 8", text)
             self.assertIn("FDK-AAC", text)
-            self.assertIn("Red Book", text)
+            self.assertIn("Perfect CD Copy", text)
+            self.assertIn("Compressed but Still Great", text)
+            self.assertIn("bit-perfect", text)
+
+            # Window default geometry tests
+            self.assertEqual(window.minimumSize().width(), 1020)
+            self.assertEqual(window.minimumSize().height(), 700)
+            self.assertEqual(window.sizeHint().width(), 1020)
+            self.assertEqual(window.sizeHint().height(), 700)
+            self.assertEqual(window.minimumSizeHint().width(), 1020)
+            self.assertEqual(window.minimumSizeHint().height(), 700)
+            self.assertEqual(window.main_deck.sizeHint().width(), 1020)
+            self.assertEqual(window.main_deck.sizeHint().height(), 700)
+            self.assertEqual(window.main_deck.minimumSizeHint().width(), 1020)
+            self.assertEqual(window.main_deck.minimumSizeHint().height(), 700)
+            self.assertEqual(window.ripping_page.sizeHint().width(), 1020)
+            self.assertEqual(window.ripping_page.sizeHint().height(), 700)
+            self.assertEqual(window.ripping_page.minimumSizeHint().width(), 1020)
+            self.assertEqual(window.ripping_page.minimumSizeHint().height(), 700)
+            self.assertEqual(window.track_table.sizeHint().width(), 600)
+            self.assertEqual(window.track_table.sizeHint().height(), 360)
+            self.assertEqual(window.track_table.minimumSizeHint().width(), 400)
+            self.assertEqual(window.track_table.minimumSizeHint().height(), 200)
 
             # Metadata source provenance label tests
             self.assertTrue(window.album_source_label.isHidden())
@@ -680,7 +702,7 @@ class TestTrackTableWidget(unittest.TestCase):
         # 2. Offline / unindexed CD
         offline_album = AlbumInfo(title="Audio CD", artist="Various Artists", album_artist="Various Artists")
         win._populate_album(offline_album)
-        win.album_source_label.setText.assert_called_with("Source: Optical CD TOC (Unindexed)")
+        win.album_source_label.setVisible.assert_called_with(False)
 
     def test_progressive_detection_query_state(self):
         """Verify in-flight querying state disables Rip button and displays illuminated indicator."""
@@ -742,7 +764,7 @@ class TestTrackTableWidget(unittest.TestCase):
         # 3. Fallback when unindexed / offline
         win._on_metadata_resolved(toc, basic)
         win.album_title_label.setText.assert_called_with("Audio CD (1 Tracks)")
-        win.album_source_label.setText.assert_called_with("Source: Optical CD TOC (Unindexed)")
+        win.album_source_label.setVisible.assert_called_with(False)
         win.btn_rip.setEnabled.assert_called_with(True)
 
     def test_platform_windows_helpers(self):
@@ -780,18 +802,39 @@ class TestTrackTableWidget(unittest.TestCase):
         dlg_fail = CompletionDialog(fail_rep)
         self.assertIsNotNone(dlg_fail)
 
-        # Pristine report
+        # Pristine report (streamlined: no redundant list of zeroes)
         good_rep = AlbumRipReport(
             album_title="Good Disc",
             artist="Artist",
             total_tracks=1,
             overall_status="pristine",
+            duration_seconds=371.0,
             track_reports=[
                 TrackRipReport(track_number=1, title="T1", status="pristine"),
             ],
         )
+        self.assertIn("6m 11s", good_rep.human_readable_summary)
+        self.assertIn("100% bit-perfect accuracy", good_rep.human_readable_summary)
         dlg_good = CompletionDialog(good_rep)
         self.assertIsNotNone(dlg_good)
+        # Pristine dialog should not contain defect previewCard
+        preview_frames = [f for f in dlg_good.findChildren(QFrame) if f.objectName() == "previewCard"]
+        self.assertEqual(len(preview_frames), 0)
+
+        # Degraded report with retries
+        rec_rep = AlbumRipReport(
+            album_title="Scratched Disc",
+            artist="Artist",
+            total_tracks=1,
+            overall_status="recovered",
+            total_retries=3,
+            track_reports=[
+                TrackRipReport(track_number=1, title="T1", status="recovered", read_retries=3),
+            ],
+        )
+        dlg_rec = CompletionDialog(rec_rep)
+        rec_preview_frames = [f for f in dlg_rec.findChildren(QFrame) if f.objectName() == "previewCard"]
+        self.assertEqual(len(rec_preview_frames), 1)
 
     def test_track_table_widget_non_selectable(self):
         from lazycdripper.gui.widgets.track_table import TrackTableWidget, HAVE_QT
@@ -863,6 +906,204 @@ class TestTrackTableWidget(unittest.TestCase):
         self.assertFalse(hasattr(MainWindow, "_create_top_bar"))
         self.assertTrue(hasattr(MainWindow, "_create_main_deck"))
 
+    def test_ripping_view_completion_and_reset(self):
+        """Verify RippingViewWidget native in-screen completion and reset behavior."""
+        from lazycdripper.gui.widgets.ripping_view import RippingViewWidget, HAVE_QT
+        if not HAVE_QT:
+            self.skipTest("PySide6 not available in this environment")
+
+        from pathlib import Path
+        from PySide6.QtWidgets import QApplication
+        from lazycdripper.core.models import AlbumRipReport, TrackRipReport, AlbumInfo
+
+        app = QApplication.instance() or QApplication([])
+
+        view = RippingViewWidget()
+        self.assertTrue(view.active_container.isVisible())
+        self.assertFalse(view.completion_container.isVisible())
+
+        # Test pristine completion
+        pristine_rep = AlbumRipReport(
+            album_title="Test Pristine",
+            artist="Audiophile Artist",
+            total_tracks=2,
+            overall_status="pristine",
+            duration_seconds=120.0,
+            destination_directory=Path("/tmp/rip"),
+            flac_directory=Path("/tmp/rip/Artist - Album [FLAC]"),
+            aac_directory=Path("/tmp/rip/Artist - Album [AAC]"),
+            flac_size_bytes=50 * 1024 * 1024,
+            aac_size_bytes=15 * 1024 * 1024,
+            track_reports=[
+                TrackRipReport(track_number=1, title="T1", status="pristine"),
+                TrackRipReport(track_number=2, title="T2", status="pristine"),
+            ],
+        )
+
+        done_called = []
+        view.show_completion(pristine_rep, on_done=lambda: done_called.append(True))
+
+        self.assertFalse(view.active_container.isVisible())
+        self.assertTrue(view.completion_container.isVisible())
+        self.assertIn("Rip Complete", view.headline.text())
+        self.assertFalse(view.headline.text().startswith("🟢"))
+        self.assertTrue(view.status_led.isVisible())
+        self.assertFalse(hasattr(view, "defect_card"))
+        self.assertTrue(view.output_card.isVisible())
+        self.assertIn("Artist - Album [FLAC] - Lossless Archive", view.flac_dir_label.text())
+        self.assertIn("50.0 MB", view.flac_dir_label.text())
+        # Sloth completion mascot is displayed in place of transport disc
+        self.assertTrue(view.sloth_emblem.isVisible())
+        self.assertFalse(view.transport_widget.isVisible())
+
+        # Test Done button callback
+        view.btn_done.click()
+        self.assertEqual(done_called, [True])
+
+        # Test damaged/recovered report shows defects in upper visual card summary
+        scratched_rep = AlbumRipReport(
+            album_title="Scratched",
+            artist="Artist",
+            total_tracks=1,
+            overall_status="recovered",
+            total_retries=5,
+            track_reports=[
+                TrackRipReport(track_number=1, title="T1", status="recovered", read_retries=5),
+            ],
+        )
+        view.show_completion(scratched_rep)
+        self.assertIn("Sector Retries: 5 recovered", view.status_sub.text())
+        self.assertTrue(view.status_led.isVisible())
+
+        # Test damaged report with unrecoverable errors (surface damage triggers sad sloth mascot)
+        damaged_rep = AlbumRipReport(
+            album_title="Damaged",
+            artist="Artist",
+            total_tracks=2,
+            overall_status="degraded",
+            total_retries=10,
+            total_errors=4,
+            track_reports=[
+                TrackRipReport(track_number=1, title="T1", status="pristine"),
+                TrackRipReport(track_number=2, title="T2", status="degraded", read_errors=4),
+            ],
+        )
+        view.show_completion(damaged_rep)
+        self.assertIn("Surface Damage Detected", view.headline.text())
+        self.assertFalse(view.headline.text().startswith("🔴"))
+        self.assertTrue(view.status_led.isVisible())
+        self.assertIn("Unrecoverable Skips: 4 sector(s)", view.status_sub.text())
+        self.assertTrue(view.sloth_emblem.isVisible())
+
+        # Test reset_view resets containers and states
+        view.reset_view()
+        self.assertTrue(view.active_container.isVisible())
+        self.assertFalse(view.completion_container.isVisible())
+        self.assertFalse(view.sloth_emblem.isVisible())
+        self.assertFalse(view.status_led.isVisible())
+        self.assertTrue(view.transport_widget.isVisible())
+        self.assertEqual(view.track_bar.value(), 0)
+        self.assertEqual(view.overall_bar.value(), 0)
+        self.assertEqual(view.headline.text(), "Extracting Audio Tracks...")
+
+        # Test set_album resets view
+        view.show_completion(scratched_rep)
+        self.assertTrue(view.completion_container.isVisible())
+        view.set_album(AlbumInfo(title="New Album", artist="New Artist"))
+        self.assertTrue(view.active_container.isVisible())
+        self.assertFalse(view.completion_container.isVisible())
+
+    def test_ripping_view_emblem_spacing_symmetry(self):
+        """Verify symmetrical spacing above and below the center visual emblem."""
+        from lazycdripper.gui.widgets.ripping_view import RippingViewWidget, HAVE_QT
+        if not HAVE_QT:
+            self.skipTest("PySide6 not available in this environment")
+
+        from PySide6.QtWidgets import QApplication, QSpacerItem
+        app = QApplication.instance() or QApplication(["-platform", "offscreen"])
+
+        view = RippingViewWidget()
+        self.assertTrue(hasattr(view, "emblem_container"))
+        self.assertTrue(hasattr(view, "sloth_emblem"))
+        self.assertTrue(hasattr(view, "spec_badge"))
+
+        # Verify sloth emblem has clean transparent background without asymmetric margin-bottom
+        self.assertNotIn("margin-bottom", view.sloth_emblem.styleSheet())
+        self.assertEqual(view.sloth_emblem.width(), 200)
+        self.assertEqual(view.sloth_emblem.height(), 200)
+        self.assertEqual(view.status_led.width(), 18)
+        self.assertEqual(view.status_led.height(), 18)
+
+        # Inspect visual_layout items
+        visual_layout = view.visual_frame.layout()
+        self.assertEqual(visual_layout.spacing(), 0)
+
+        # Find items in visual_layout
+        items = [visual_layout.itemAt(i) for i in range(visual_layout.count())]
+        badge_idx = None
+        emblem_idx = None
+        headline_idx = None
+
+        for idx, item in enumerate(items):
+            if item.widget() == view.spec_badge:
+                badge_idx = idx
+            elif item.widget() == view.emblem_container:
+                emblem_idx = idx
+            elif item.layout() is not None:
+                headline_idx = idx
+                break
+
+        self.assertIsNotNone(badge_idx)
+        self.assertIsNotNone(emblem_idx)
+        self.assertIsNotNone(headline_idx)
+
+        # Spacer between badge and emblem
+        spacer_above = items[badge_idx + 1]
+        # Spacer between emblem and headline
+        spacer_below = items[emblem_idx + 1]
+
+        self.assertIsInstance(spacer_above, QSpacerItem)
+        self.assertIsInstance(spacer_below, QSpacerItem)
+        # Symmetrical spacing heights must be exactly equal
+        self.assertEqual(spacer_above.sizeHint().height(), spacer_below.sizeHint().height())
+
+    def test_dialog_sizes_and_hints(self):
+        """Verify all secondary modal dialogs enforce explicit compact size hints."""
+        from lazycdripper.gui.widgets.credits_dialog import CreditsDialog, HAVE_QT
+        from lazycdripper.gui.widgets.liner_notes_dialog import LinerNotesDialog
+        from lazycdripper.gui.widgets.completion_dialog import CompletionDialog
+        from lazycdripper.core.models import AlbumRipReport
+
+        if not HAVE_QT:
+            self.skipTest("PySide6 not available in this environment")
+
+        from PySide6.QtWidgets import QApplication
+        app = QApplication.instance() or QApplication(["-platform", "offscreen"])
+
+        credits_dlg = CreditsDialog()
+        self.assertEqual(credits_dlg.minimumSize().width(), 560)
+        self.assertEqual(credits_dlg.minimumSize().height(), 520)
+        self.assertEqual(credits_dlg.sizeHint().width(), 560)
+        self.assertEqual(credits_dlg.sizeHint().height(), 520)
+        self.assertEqual(credits_dlg.minimumSizeHint().width(), 560)
+        self.assertEqual(credits_dlg.minimumSizeHint().height(), 520)
+
+        notes_dlg = LinerNotesDialog()
+        self.assertEqual(notes_dlg.minimumSize().width(), 540)
+        self.assertEqual(notes_dlg.minimumSize().height(), 480)
+        self.assertEqual(notes_dlg.sizeHint().width(), 540)
+        self.assertEqual(notes_dlg.sizeHint().height(), 480)
+        self.assertEqual(notes_dlg.minimumSizeHint().width(), 540)
+        self.assertEqual(notes_dlg.minimumSizeHint().height(), 480)
+
+        rep = AlbumRipReport(album_title="Test", artist="Artist", total_tracks=1)
+        comp_dlg = CompletionDialog(report=rep)
+        self.assertEqual(comp_dlg.sizeHint().width(), 540)
+        self.assertEqual(comp_dlg.sizeHint().height(), 480)
+        self.assertEqual(comp_dlg.minimumSizeHint().width(), 540)
+        self.assertEqual(comp_dlg.minimumSizeHint().height(), 480)
+
 
 if __name__ == "__main__":
     unittest.main()
+

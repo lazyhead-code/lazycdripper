@@ -45,6 +45,8 @@ class CdparanoiaRipper:
                 cmd,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=15,
             )
             # cdparanoia outputs TOC information to stderr!
@@ -88,6 +90,8 @@ class CdparanoiaRipper:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 bufsize=1,
             )
 

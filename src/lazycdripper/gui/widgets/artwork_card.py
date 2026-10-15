@@ -244,13 +244,13 @@ class ArtworkCardWidget(QWidget if HAVE_QT else object):
         painter.setPen(QColor("#C5C4D4"))
         painter.drawText(0, int(cy + 42), width, 16, Qt.AlignCenter, "COMPACT DISC DIGITAL AUDIO")
 
-        # Platter engraved spec: RED BOOK • 44.1 kHz / 16-BIT PCM
+        # Platter engraved spec: AUDIO CD • 16-BIT / 44.1 kHz
         font.setPixelSize(9)
         font.setBold(True)
         font.setLetterSpacing(QFont.AbsoluteSpacing, 0.6)
         painter.setFont(font)
         painter.setPen(QColor("#9CA3AF"))
-        painter.drawText(0, int(cy + 60), width, 16, Qt.AlignCenter, "RED BOOK • 44.1 kHz / 16-BIT PCM")
+        painter.drawText(0, int(cy + 60), width, 16, Qt.AlignCenter, "AUDIO CD • 16-BIT / 44.1 kHz")
 
         painter.end()
         pixmap.setDevicePixelRatio(scale)

@@ -8,7 +8,7 @@ from lazycdripper.gui.platform_windows import setup_windows_window
 from lazycdripper.gui.theme import DARK_ROCK_STYLESHEET
 
 try:
-    from PySide6.QtCore import Qt, QUrl
+    from PySide6.QtCore import Qt, QUrl, QSize
     from PySide6.QtGui import QColor, QDesktopServices, QPainter
     from PySide6.QtWidgets import (
         QDialog,
@@ -44,12 +44,23 @@ class CompletionDialog(QDialog if HAVE_QT else object):
 
         self.setWindowTitle("Rip Complete — Integrity Audit")
         self.setFixedWidth(540)
+        self.resize(540, 480)
         if hasattr(Qt, "WindowMaximizeButtonHint"):
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowMaximizeButtonHint)
         self.setStyleSheet(DARK_ROCK_STYLESHEET)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setAutoFillBackground(True)
         self._setup_ui()
+
+    def sizeHint(self):
+        if HAVE_QT:
+            return QSize(540, 480)
+        return super().sizeHint() if hasattr(super(), "sizeHint") else None
+
+    def minimumSizeHint(self):
+        if HAVE_QT:
+            return QSize(540, 480)
+        return super().minimumSizeHint() if hasattr(super(), "minimumSizeHint") else None
 
     def paintEvent(self, event):
         if not HAVE_QT:
@@ -106,26 +117,38 @@ class CompletionDialog(QDialog if HAVE_QT else object):
 
         main_layout.addWidget(badge_card)
 
-        # 2. Key Metrics Table
-        metrics_frame = QFrame()
-        metrics_frame.setObjectName("previewCard")
-        if hasattr(QSizePolicy, "Expanding") and hasattr(QSizePolicy, "Fixed"):
-            metrics_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        metrics_layout = QVBoxLayout(metrics_frame)
-        metrics_layout.setSpacing(6)
+        # 2. Defect / Recovery Notices (Only shown if disc had read imperfections)
+        has_retries = self.report.total_retries > 0
+        has_errors = self.report.total_errors > 0
+        incomplete_rip = (
+            self.report.total_tracks > 0
+            and self.report.successful_tracks_count < self.report.total_tracks
+            and self.report.successful_tracks_count > 0
+        )
+        if not self.report.is_perfect and (has_retries or has_errors or incomplete_rip):
+            notice_frame = QFrame()
+            notice_frame.setObjectName("previewCard")
+            if hasattr(QSizePolicy, "Expanding") and hasattr(QSizePolicy, "Fixed"):
+                notice_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            notice_layout = QVBoxLayout(notice_frame)
+            notice_layout.setSpacing(6)
 
-        tracks_str = f"Tracks Extracted: {self.report.successful_tracks_count}/{self.report.total_tracks} tracks"
-        jitter_str = f"Jitter Alignments: {self.report.total_jitter}"
-        retries_str = f"Sector Retries: {self.report.total_retries}"
-        errors_str = f"Unrecoverable Skips: {self.report.total_errors}"
-        time_str = f"Time Elapsed: {int(self.report.duration_seconds // 60)}m {int(self.report.duration_seconds % 60)}s"
+            if incomplete_rip:
+                lbl_tracks = QLabel(f"•  Tracks Extracted: {self.report.successful_tracks_count}/{self.report.total_tracks} tracks")
+                lbl_tracks.setStyleSheet("color: #9CA3AF; font-size: 12px; font-weight: 500;")
+                notice_layout.addWidget(lbl_tracks)
 
-        for stat_text in [tracks_str, jitter_str, retries_str, errors_str, time_str]:
-            lbl = QLabel(f"•  {stat_text}")
-            lbl.setStyleSheet("color: #9CA3AF; font-size: 12px; font-weight: 500;")
-            metrics_layout.addWidget(lbl)
+            if has_retries:
+                lbl_retries = QLabel(f"🟡  Sector Retries: {self.report.total_retries} recovered")
+                lbl_retries.setStyleSheet("color: #F59E0B; font-size: 12px; font-weight: 500;")
+                notice_layout.addWidget(lbl_retries)
 
-        main_layout.addWidget(metrics_frame)
+            if has_errors:
+                lbl_errors = QLabel(f"🔴  Unrecoverable Skips: {self.report.total_errors} sector(s)")
+                lbl_errors.setStyleSheet("color: #EF4444; font-size: 12px; font-weight: 500;")
+                notice_layout.addWidget(lbl_errors)
+
+            main_layout.addWidget(notice_frame)
 
         # 3. Output Sister Directories
         if self.report.successful_tracks_count > 0:
@@ -135,11 +158,13 @@ class CompletionDialog(QDialog if HAVE_QT else object):
             flac_mb = self.report.flac_size_bytes / (1024 * 1024)
             aac_mb = self.report.aac_size_bytes / (1024 * 1024)
 
-            flac_label = QLabel(f"📁 [FLAC] Master Archive ({flac_mb:.1f} MB — Level 8 Verified Checksum)")
+            flac_title = self.report.flac_directory.name if self.report.flac_directory else "[FLAC]"
+            aac_title = self.report.aac_directory.name if self.report.aac_directory else "[AAC]"
+            flac_label = QLabel(f"📁  {flac_title} - Lossless Archive ({flac_mb:.1f} MB)")
             flac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
             output_box.addWidget(flac_label)
 
-            aac_label = QLabel(f"📁 [AAC] Mobile Library ({aac_mb:.1f} MB — 256 kbps Bluetooth-Optimized)")
+            aac_label = QLabel(f"📁  {aac_title} - Mobile Library ({aac_mb:.1f} MB)")
             aac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
             output_box.addWidget(aac_label)
 

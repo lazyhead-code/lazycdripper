@@ -6,7 +6,7 @@ from lazycdripper.gui.platform_windows import setup_windows_window
 from lazycdripper.gui.theme import DARK_ROCK_STYLESHEET
 
 try:
-    from PySide6.QtCore import Qt
+    from PySide6.QtCore import Qt, QSize
     from PySide6.QtGui import QColor, QPainter
     from PySide6.QtWidgets import (
         QDialog,
@@ -50,10 +50,21 @@ class LinerNotesDialog(QDialog if HAVE_QT else object):
         super().__init__(parent)
         self.setWindowTitle("Liner Notes — Why Lazy CD Ripper?")
         self.setMinimumSize(540, 480)
+        self.resize(540, 480)
         self.setStyleSheet(DARK_ROCK_STYLESHEET)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setAutoFillBackground(True)
         self._setup_ui()
+
+    def sizeHint(self):
+        if HAVE_QT:
+            return QSize(540, 480)
+        return super().sizeHint() if hasattr(super(), "sizeHint") else None
+
+    def minimumSizeHint(self):
+        if HAVE_QT:
+            return QSize(540, 480)
+        return super().minimumSizeHint() if hasattr(super(), "minimumSizeHint") else None
 
     def paintEvent(self, event):
         if not HAVE_QT:

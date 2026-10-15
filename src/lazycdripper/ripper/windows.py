@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import platform
 import re
+import time
 from typing import Callable, Dict, List, Optional
 import wave
 
@@ -150,6 +151,10 @@ class WindowsCddaRipper:
                 pcm_chunks: List[bytes] = []
                 consecutive_errors = 0
 
+                start_time = time.monotonic()
+                last_speed_time = start_time
+                last_speed_sectors = 0
+
                 while sectors_read < length_sectors:
                     cur_sectors = min(batch_sectors, length_sectors - sectors_read)
                     cur_sector_offset = start_sector + sectors_read
@@ -242,6 +247,17 @@ class WindowsCddaRipper:
 
                         if batch_aborted:
                             break
+
+                    # Real-time speed calculation: 75 sectors = 1 second of standard CD audio (1x)
+                    now = time.monotonic()
+                    dt = now - last_speed_time
+                    if dt >= 0.35:
+                        d_sec = sectors_read - last_speed_sectors
+                        instant_speed = (d_sec / 75.0) / dt
+                        if instant_speed > 0.1:
+                            progress.current_speed = f"{instant_speed:.1f}x"
+                        last_speed_time = now
+                        last_speed_sectors = sectors_read
 
                     pct = (sectors_read / length_sectors) * 100.0
                     progress.track_percent = min(100.0, pct)

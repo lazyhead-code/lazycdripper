@@ -73,7 +73,7 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
             self.assertEqual(report.total_tracks, 2)
             self.assertTrue(report.is_perfect)
             self.assertEqual(report.overall_status, "pristine")
-            self.assertEqual(report.summary_headline, "🟢 Bit-Perfect Pristine Rip")
+            self.assertEqual(report.summary_headline, "🟢 Rip Complete")
             self.assertIn("100% bit-perfect accuracy", report.human_readable_summary)
             self.assertEqual(len(report.track_reports), 2)
             self.assertGreater(len(progress_events), 0)
@@ -125,7 +125,8 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
         )
         self.assertFalse(dmg_report.is_perfect)
         self.assertEqual(dmg_report.summary_headline, "🔴 Surface Damage Detected")
-        self.assertIn("Severe scratch damage", dmg_report.human_readable_summary)
+        self.assertIn("Unrecoverable Skips: 2 sector(s)", dmg_report.human_readable_summary)
+        self.assertIn("Sector Retries: 10 recovered", dmg_report.human_readable_summary)
 
         # Failed report
         fail_report = AlbumRipReport(

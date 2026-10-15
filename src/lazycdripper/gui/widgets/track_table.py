@@ -4,7 +4,7 @@ from typing import List, Optional
 from lazycdripper.core.models import TrackInfo
 
 try:
-    from PySide6.QtCore import Qt
+    from PySide6.QtCore import Qt, QSize
     from PySide6.QtWidgets import (
         QHeaderView,
         QTableWidget,
@@ -26,6 +26,16 @@ class TrackTableWidget(QWidget if HAVE_QT else object):
             return
         super().__init__(parent)
         self._setup_ui()
+
+    def sizeHint(self):
+        if HAVE_QT:
+            return QSize(600, 360)
+        return super().sizeHint() if hasattr(super(), "sizeHint") else None
+
+    def minimumSizeHint(self):
+        if HAVE_QT:
+            return QSize(400, 200)
+        return super().minimumSizeHint() if hasattr(super(), "minimumSizeHint") else None
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)

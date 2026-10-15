@@ -85,6 +85,41 @@ class TestModels(unittest.TestCase):
         self.assertEqual(AudioFormat.FLAC.value, "flac")
         self.assertEqual(AudioFormat.AAC.value, "aac")
 
+    def test_album_rip_report_clean_headline(self):
+        from lazycdripper.core.models import AlbumRipReport
+
+        # Pristine
+        rep_ok = AlbumRipReport(
+            album_title="Album",
+            artist="Artist",
+            total_tracks=1,
+            overall_status="pristine",
+        )
+        self.assertEqual(rep_ok.summary_headline, "🟢 Rip Complete")
+        self.assertEqual(rep_ok.clean_headline, "Rip Complete")
+
+        # Degraded / surface damage
+        rep_dmg = AlbumRipReport(
+            album_title="Album",
+            artist="Artist",
+            total_tracks=1,
+            overall_status="degraded",
+            total_errors=2,
+        )
+        self.assertEqual(rep_dmg.summary_headline, "🔴 Surface Damage Detected")
+        self.assertEqual(rep_dmg.clean_headline, "Surface Damage Detected")
+
+        # Recovered
+        rep_rec = AlbumRipReport(
+            album_title="Album",
+            artist="Artist",
+            total_tracks=1,
+            overall_status="recovered",
+            total_retries=3,
+        )
+        self.assertEqual(rep_rec.summary_headline, "🟡 Recovered With Multi-Pass Correction")
+        self.assertEqual(rep_rec.clean_headline, "Recovered With Multi-Pass Correction")
+
 
 if __name__ == "__main__":
     unittest.main()

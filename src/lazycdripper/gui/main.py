@@ -15,6 +15,14 @@ def main():
         print("PySide6 is not installed. Please run: pip install 'pyside6>=6.6.0'")
         return 1
 
+    # Ensure console streams handle UTF-8 without charmap decode/encode crashes on Windows
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     # On Windows, set explicit AppUserModelID so taskbar groups properly and shows app icon
     if sys.platform == "win32":
         try:
@@ -37,6 +45,7 @@ def main():
     app.setStyleSheet(DARK_ROCK_STYLESHEET)
 
     window = MainWindow()
+    window.resize(1020, 700)
     window.show()
 
     return app.exec()

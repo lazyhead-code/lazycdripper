@@ -20,7 +20,6 @@ from lazycdripper.disc.toc import DiscTOC, get_disc_toc
 from lazycdripper.gui.platform_windows import setup_windows_window
 from lazycdripper.gui.theme import DARK_ROCK_STYLESHEET
 from lazycdripper.gui.widgets.artwork_card import ArtworkCardWidget
-from lazycdripper.gui.widgets.completion_dialog import CompletionDialog
 from lazycdripper.gui.widgets.credits_dialog import CreditsDialog
 from lazycdripper.gui.widgets.ripping_view import RippingViewWidget
 from lazycdripper.gui.widgets.track_table import TrackTableWidget
@@ -30,7 +29,7 @@ from lazycdripper.pipeline.orchestrator import RipPipelineOrchestrator
 logger = logging.getLogger(__name__)
 
 try:
-    from PySide6.QtCore import QPointF, QThread, QTimer, Qt, Signal
+    from PySide6.QtCore import QPointF, QSize, QThread, QTimer, Qt, Signal
     from PySide6.QtGui import QColor, QIcon, QLinearGradient, QPainter, QPen, QPixmap, QRadialGradient
     from PySide6.QtWidgets import (
         QFileDialog,
@@ -73,6 +72,7 @@ except ImportError:
 
     Signal = _MockSignal
     QPointF = object
+    QSize = object
     QPen = object
     QTimer = object
 
@@ -256,7 +256,7 @@ class BackgroundBackdropWidget(QWidget if HAVE_QT else object):
         if not HAVE_QT:
             return
         super().__init__(parent)
-        self._default_pixmap = _get_logo_pixmap()
+        self._default_pixmap = None
         self._artwork_pixmap: Optional[QPixmap] = None
 
     def set_artwork_pixmap(self, pixmap: Optional[QPixmap]):
@@ -274,70 +274,49 @@ class BackgroundBackdropWidget(QWidget if HAVE_QT else object):
         # Base deep chassis color
         painter.fillRect(self.rect(), QColor("#0A0A0D"))
 
-        # Atmospheric vintage hi-fi backdrop (ambient album artwork if available, else default logo)
-        is_album_art = bool(self._artwork_pixmap and not self._artwork_pixmap.isNull())
-        pixmap_to_draw = self._artwork_pixmap if is_album_art else self._default_pixmap
+        # Subtle warm dark amber chassis radial vignette
+        center_x = self.width() / 2.0
+        center_y = self.height() / 2.0
+        radius = max(self.width(), self.height()) * 0.75
+        radial = QRadialGradient(center_x, center_y, radius)
+        radial.setColorAt(0.0, QColor(24, 20, 18, 90))
+        radial.setColorAt(0.65, QColor(14, 14, 18, 140))
+        radial.setColorAt(1.0, QColor(10, 10, 13, 255))
+        painter.fillRect(self.rect(), radial)
 
-        if pixmap_to_draw and not pixmap_to_draw.isNull():
-            if not is_album_art:
-                # Stable scale: Do not zoom dynamically on window resize.
-                # Window resizing acts as a viewport uncover mechanism, revealing
-                # more of the surrounding audio equipment without zooming in or cropping.
-                pw = pixmap_to_draw.width()
-                ph = pixmap_to_draw.height()
-                x = (self.width() - pw) // 2
-                y = 0 if self.height() <= ph else (self.height() - ph) // 2
-
-                painter.setOpacity(0.18)
-                painter.drawPixmap(x, y, pixmap_to_draw)
-
-                # If window is wider than native artwork, softly feather the left and right edges
-                # into the dark chassis background so there are no visible rectangular seams
-                if self.width() > pw:
-                    painter.setOpacity(1.0)
-                    left_feather = QLinearGradient(x, 0, x + 100, 0)
-                    left_feather.setColorAt(0.0, QColor(10, 10, 13, 255))
-                    left_feather.setColorAt(1.0, QColor(10, 10, 13, 0))
-                    painter.fillRect(x, 0, 100, self.height(), left_feather)
-
-                    right_feather = QLinearGradient(x + pw - 100, 0, x + pw, 0)
-                    right_feather.setColorAt(0.0, QColor(10, 10, 13, 0))
-                    right_feather.setColorAt(1.0, QColor(10, 10, 13, 255))
-                    painter.fillRect(x + pw - 100, 0, 100, self.height(), right_feather)
-
-                if self.height() > ph:
-                    painter.setOpacity(1.0)
-                    bottom_feather = QLinearGradient(0, y + ph - 80, 0, y + ph)
-                    bottom_feather.setColorAt(0.0, QColor(10, 10, 13, 0))
-                    bottom_feather.setColorAt(1.0, QColor(10, 10, 13, 255))
-                    painter.fillRect(0, y + ph - 80, self.width(), 80, bottom_feather)
-            else:
-                scaled = pixmap_to_draw.scaled(
-                    self.size(),
-                    Qt.KeepAspectRatioByExpanding,
-                    Qt.SmoothTransformation,
-                )
-                x = (self.width() - scaled.width()) // 2
-                y = (self.height() - scaled.height()) // 2
-                painter.setOpacity(0.30)
-                painter.drawPixmap(x, y, scaled)
+        # Atmospheric ambient album artwork if available
+        if self._artwork_pixmap and not self._artwork_pixmap.isNull():
+            scaled = self._artwork_pixmap.scaled(
+                self.size(),
+                Qt.KeepAspectRatioByExpanding,
+                Qt.SmoothTransformation,
+            )
+            x = (self.width() - scaled.width()) // 2
+            y = (self.height() - scaled.height()) // 2
+            painter.setOpacity(0.25)
+            painter.drawPixmap(x, y, scaled)
 
             # Soft dark radial vignette so text & cards maintain pristine contrast
             painter.setOpacity(1.0)
-            radial = QRadialGradient(
-                self.width() / 2.0,
-                self.height() / 2.0,
-                max(self.width(), self.height()) * 0.75,
-            )
-            if is_album_art:
-                radial.setColorAt(0.0, QColor(10, 10, 13, 85))
-                radial.setColorAt(0.65, QColor(10, 10, 13, 175))
-                radial.setColorAt(1.0, QColor(10, 10, 13, 238))
-            else:
-                radial.setColorAt(0.0, QColor(10, 10, 13, 110))
-                radial.setColorAt(0.7, QColor(10, 10, 13, 220))
-                radial.setColorAt(1.0, QColor(10, 10, 13, 252))
-            painter.fillRect(self.rect(), radial)
+            art_radial = QRadialGradient(center_x, center_y, radius)
+            art_radial.setColorAt(0.0, QColor(10, 10, 13, 85))
+            art_radial.setColorAt(0.65, QColor(10, 10, 13, 175))
+            art_radial.setColorAt(1.0, QColor(10, 10, 13, 238))
+            painter.fillRect(self.rect(), art_radial)
+
+
+class MainDeckWidget(QWidget if HAVE_QT else object):
+    """The single unified main screen housing the hardware controls and track deck."""
+
+    def sizeHint(self):
+        if HAVE_QT:
+            return QSize(1020, 700)
+        return super().sizeHint() if hasattr(super(), "sizeHint") else None
+
+    def minimumSizeHint(self):
+        if HAVE_QT:
+            return QSize(1020, 700)
+        return super().minimumSizeHint() if hasattr(super(), "minimumSizeHint") else None
 
 
 class MainWindow(QMainWindow if HAVE_QT else object):
@@ -374,6 +353,7 @@ class MainWindow(QMainWindow if HAVE_QT else object):
 
         self.setWindowTitle("Lazy CD Ripper")
         self.setMinimumSize(1020, 700)
+        self.resize(1020, 700)
         self.setStyleSheet(DARK_ROCK_STYLESHEET)
 
         icon_path = locate_app_icon_path()
@@ -381,6 +361,8 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             self.setWindowIcon(QIcon(str(icon_path)))
 
         self._setup_ui()
+        if HAVE_QT:
+            self.resize(1020, 700)
 
         # Synchronously populate detected optical drives on Frame 1 (< 0.1ms on Windows)
         initial_drives = detect_optical_drives()
@@ -401,10 +383,22 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             self.auto_scan_timer.timeout.connect(self._on_auto_scan_poll)
             self.auto_scan_timer.start()
 
+    def sizeHint(self):
+        if HAVE_QT:
+            return QSize(1020, 700)
+        return super().sizeHint() if hasattr(super(), "sizeHint") else None
+
+    def minimumSizeHint(self):
+        if HAVE_QT:
+            return QSize(1020, 700)
+        return super().minimumSizeHint() if hasattr(super(), "minimumSizeHint") else None
+
     def showEvent(self, event):
         if HAVE_QT:
             super().showEvent(event)
             setup_windows_window(self)
+            if not self.isMaximized():
+                self.resize(1020, 700)
             # Ensure detection fires when window first renders
             QTimer.singleShot(50, lambda: self._trigger_detection(is_manual=False))
 
@@ -429,7 +423,7 @@ class MainWindow(QMainWindow if HAVE_QT else object):
 
     def _create_main_deck(self) -> QWidget:
         """The single unified main screen housing the hardware controls and track deck."""
-        deck = QWidget()
+        deck = MainDeckWidget()
         layout = QHBoxLayout(deck)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(28)
@@ -488,9 +482,9 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             "<tr>"
             "<td width='12' valign='top' style='color: #FF9E3B; font-size: 8px; padding-top: 2px;'>●</td>"
             "<td style='padding-bottom: 10px;'>"
-            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>FLAC LOSSLESS (Level 8, Verified)</div>"
+            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>FLAC LOSSLESS (Perfect CD Copy)</div>"
             "<div style='color: #8E8D96; font-size: 9px; margin-top: 3px; line-height: 1.35;'>"
-            "Red Book 16-bit / 44.1 kHz bit-perfect master.<br>"
+            "Audio CD 16-bit / 44.1 kHz bit-perfect master.<br>"
             "Archival compression (Level 8) with MD5 stream verify."
             "</div>"
             "</td>"
@@ -498,9 +492,9 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             "<tr>"
             "<td width='12' valign='top' style='color: #FF9E3B; font-size: 8px; padding-top: 2px;'>●</td>"
             "<td>"
-            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>AAC LOSSY (VBR Mode 5 / 256k)</div>"
+            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>AAC LOSSY (Compressed but Still Great)</div>"
             "<div style='color: #8E8D96; font-size: 9px; margin-top: 3px; line-height: 1.35;'>"
-            "Fraunhofer FDK-AAC (Mode 5, AAC-LC in .m4a).<br>"
+            "Fraunhofer FDK-AAC (VBR Mode 5 / 256k in .m4a).<br>"
             "Native Bluetooth codec (avoids cross-codec transcode artifacts)."
             "</div>"
             "</td>"
@@ -821,18 +815,8 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             )
             self.album_source_label.setVisible(True)
         else:
-            self.album_source_label.setText("Source: Optical CD TOC (Unindexed)")
-            self.album_source_label.setStyleSheet(
-                "background-color: rgba(255, 255, 255, 0.04); "
-                "border: 1px solid #282834; "
-                "border-radius: 4px; "
-                "color: #727180; "
-                "font-size: 11px; "
-                "font-weight: 500; "
-                "padding: 3px 8px; "
-                "margin-top: 4px;"
-            )
-            self.album_source_label.setVisible(True)
+            self.album_source_label.setText("")
+            self.album_source_label.setVisible(False)
 
         self.track_table.set_tracks(album.tracks)
         self.artwork_card.set_album(album)
@@ -878,6 +862,8 @@ class MainWindow(QMainWindow if HAVE_QT else object):
         self.ripping_page.set_album(self.current_album)
         self.backdrop.set_artwork_pixmap(self._get_current_artwork_pixmap())
         self.main_stack.setCurrentIndex(1)  # Switch to analog ripping screen
+        if HAVE_QT and not self.isMaximized():
+            self.resize(1020, 700)
 
         self.worker_thread = RipWorkerThread(
             orchestrator=self.orchestrator,
@@ -916,15 +902,25 @@ class MainWindow(QMainWindow if HAVE_QT else object):
 
     def _on_rip_completed(self, report: AlbumRipReport):
         self._is_ripping = False
+        self.ripping_page.show_completion(
+            report=report,
+            on_done=self._on_rip_done_dismiss,
+        )
+        if HAVE_QT and not self.isMaximized():
+            self.resize(1020, 700)
+
+    def _on_rip_done_dismiss(self):
         self.backdrop.set_artwork_pixmap(None)
         self.main_stack.setCurrentIndex(0)  # Return to main deck
-        dialog = CompletionDialog(report, parent=self)
-        dialog.exec()
+        if HAVE_QT and not self.isMaximized():
+            self.resize(1020, 700)
 
     def _on_rip_error(self, err_msg: str):
         self._is_ripping = False
         self.backdrop.set_artwork_pixmap(None)
         self.main_stack.setCurrentIndex(0)
+        if HAVE_QT and not self.isMaximized():
+            self.resize(1020, 700)
         logger.error("Ripping error occurred: %s", err_msg)
 
     def _on_version_label_clicked(self, event=None):

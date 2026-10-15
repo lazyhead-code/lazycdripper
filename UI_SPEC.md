@@ -81,7 +81,7 @@ MainWindow
     │   │   ├── PrimaryRipButton ("Rip to FLAC + AAC")
     │   │   └── PolicyContainer
     │   │       ├── EngineeringPolicyNote ("Dual rip: [FLAC Master] + [AAC Mobile @ 256k]")
-    │   │       └── ChassisVersionLabel ("v0.9.1 • Peace... Like a River • Credits" clickable laser-etched serial plate opening CreditsDialog)
+    │   │       └── ChassisVersionLabel ("v0.9.2 • Peace... Like a River • Credits" clickable laser-etched serial plate opening CreditsDialog)
     │   └── RightDeck (Master Recording Roster)
     │       ├── MetadataHeaderCard (Unified status: No Drive -> Insert audio CD -> Fetching Metadata -> Album Title)
     │       └── TrackTableWidget (4 Columns: #, Title, Artist, Time; borderless rows, full height)
