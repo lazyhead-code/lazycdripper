@@ -83,6 +83,13 @@ class TrackRipReport:
     unrecoverable_errors: int = 0
     flac_path: Optional[Path] = None
     aac_path: Optional[Path] = None
+    read_errors: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        if self.read_errors is not None and self.unrecoverable_errors == 0:
+            self.unrecoverable_errors = self.read_errors
+        elif self.read_errors is None:
+            self.read_errors = self.unrecoverable_errors
 
 
 @dataclass

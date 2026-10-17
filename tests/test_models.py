@@ -120,6 +120,18 @@ class TestModels(unittest.TestCase):
         self.assertEqual(rep_rec.summary_headline, "🟡 Recovered With Multi-Pass Correction")
         self.assertEqual(rep_rec.clean_headline, "Recovered With Multi-Pass Correction")
 
+    def test_track_rip_report(self):
+        from lazycdripper.core.models import TrackRipReport
+        # Standard initialization with unrecoverable_errors
+        t1 = TrackRipReport(track_number=1, title="Track 1", unrecoverable_errors=3)
+        self.assertEqual(t1.unrecoverable_errors, 3)
+        self.assertEqual(t1.read_errors, 3)
+
+        # Alternative alias initialization with read_errors
+        t2 = TrackRipReport(track_number=2, title="Track 2", read_errors=5)
+        self.assertEqual(t2.unrecoverable_errors, 5)
+        self.assertEqual(t2.read_errors, 5)
+
 
 if __name__ == "__main__":
     unittest.main()

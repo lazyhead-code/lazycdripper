@@ -993,7 +993,7 @@ class TestTrackTableWidget(unittest.TestCase):
             total_errors=4,
             track_reports=[
                 TrackRipReport(track_number=1, title="T1", status="pristine"),
-                TrackRipReport(track_number=2, title="T2", status="degraded", read_errors=4),
+                TrackRipReport(track_number=2, title="T2", status="degraded", unrecoverable_errors=4),
             ],
         )
         view.show_completion(damaged_rep)
