@@ -916,9 +916,10 @@ class TestTrackTableWidget(unittest.TestCase):
         from PySide6.QtWidgets import QApplication
         from lazycdripper.core.models import AlbumRipReport, TrackRipReport, AlbumInfo
 
-        app = QApplication.instance() or QApplication([])
+        app = QApplication.instance() or QApplication(["-platform", "offscreen"])
 
         view = RippingViewWidget()
+        view.show()
         self.assertTrue(view.active_container.isVisible())
         self.assertFalse(view.completion_container.isVisible())
 

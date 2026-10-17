@@ -125,7 +125,7 @@ class AlbumRipReport:
             return 0 if self.overall_status == "failed" else self.total_tracks
         return sum(
             1 for t in self.track_reports
-            if t.flac_path is not None and t.flac_path.exists() and t.status != "failed"
+            if t.status != "failed" and (t.flac_path is None or t.flac_path.exists())
         )
 
     @property
