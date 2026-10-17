@@ -84,8 +84,16 @@ class RipPipelineOrchestrator:
         # 2. Save companion cover.jpg if artwork is cached
         cover_path = album.selected_artwork.local_cache_path if album.selected_artwork else None
         if cover_path and cover_path.exists():
-            self.tagger.save_companion_cover(flac_album_dir, cover_path)
-            self.tagger.save_companion_cover(aac_album_dir, cover_path)
+            if album.total_discs > 1:
+                # Multi-disc setup: place cover.jpg directly into each Disc subfolder
+                # so folder-scoped players (Windows Media Player, Groove) discover artwork alongside audio tracks
+                disc_numbers = sorted(list({t.disc_number for t in album.tracks})) or [1]
+                for d_num in disc_numbers:
+                    self.tagger.save_companion_cover(flac_album_dir / f"Disc {d_num:02d}", cover_path)
+                    self.tagger.save_companion_cover(aac_album_dir / f"Disc {d_num:02d}", cover_path)
+            else:
+                self.tagger.save_companion_cover(flac_album_dir, cover_path)
+                self.tagger.save_companion_cover(aac_album_dir, cover_path)
 
         track_reports = []
         total_tracks = len(album.tracks)

@@ -98,6 +98,56 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
             self.assertGreater(report.flac_size_bytes, 0)
             self.assertGreater(report.aac_size_bytes, 0)
 
+    def test_execute_rip_multi_disc_companion_cover(self):
+        """Verify that multi-disc albums place cover.jpg inside each Disc XX subfolder and not in parent."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base_output = Path(temp_dir) / "Music"
+
+            cover_file = Path(temp_dir) / "cached_cover.jpg"
+            cover_file.write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 100 + b"\xff\xd9")
+
+            artwork = ArtworkCandidate(
+                image_id="202",
+                url="https://example.com/cover.jpg",
+                local_cache_path=cover_file,
+            )
+
+            album = AlbumInfo(
+                title="Everybody's Talkin'",
+                artist="Tedeschi Trucks Band",
+                album_artist="Tedeschi Trucks Band",
+                year=2012,
+                total_tracks=1,
+                total_discs=2,
+                tracks=[
+                    TrackInfo(track_number=1, title="Midnight in Harlem", artist="Tedeschi Trucks Band", disc_number=1),
+                ],
+                selected_artwork=artwork,
+            )
+
+            orchestrator = RipPipelineOrchestrator(
+                ripper=MockRipper(sample_duration_seconds=0.1),
+                encoder=MockEncoder(),
+                tagger=AudioTagger(),
+            )
+
+            report = orchestrator.execute_rip(
+                album=album,
+                base_output_dir=base_output,
+            )
+
+            self.assertIsNotNone(report)
+            expected_flac_dir = base_output / "Tedeschi Trucks Band - Everybody's Talkin' (2012) [FLAC]"
+            expected_aac_dir = base_output / "Tedeschi Trucks Band - Everybody's Talkin' (2012) [AAC]"
+
+            # Verify cover.jpg is inside Disc 01 subfolders
+            self.assertTrue((expected_flac_dir / "Disc 01" / "cover.jpg").exists())
+            self.assertTrue((expected_aac_dir / "Disc 01" / "cover.jpg").exists())
+
+            # Verify cover.jpg is NOT placed directly in parent album folders
+            self.assertFalse((expected_flac_dir / "cover.jpg").exists())
+            self.assertFalse((expected_aac_dir / "cover.jpg").exists())
+
     def test_album_rip_report_status_degraded(self):
         # Test headline badges for damaged or recovered discs
         from lazycdripper.core.models import AlbumRipReport

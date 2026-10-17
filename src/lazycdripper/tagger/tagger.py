@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 from typing import Optional
 from lazycdripper.core.models import AlbumInfo, AudioFormat, TrackInfo
+from lazycdripper.metadata.coverart import get_image_dimensions
 
 logger = logging.getLogger(__name__)
 
@@ -82,9 +83,25 @@ class AudioTagger:
                 image_data = cover_image_path.read_bytes()
                 pic = Picture()
                 pic.type = 3  # Front cover
-                pic.mime = "image/jpeg"
                 pic.desc = "Front Cover"
                 pic.data = image_data
+
+                is_png = image_data.startswith(b"\x89PNG\r\n\x1a\n")
+                if is_png:
+                    pic.mime = "image/png"
+                    pic.depth = 32
+                else:
+                    pic.mime = "image/jpeg"
+                    pic.depth = 24
+
+                # Windows Media Player & Windows Shell reject Picture blocks if width or height is 0
+                dims = get_image_dimensions(cover_image_path)
+                if dims:
+                    pic.width, pic.height = dims
+                else:
+                    pic.width = 1000
+                    pic.height = 1000
+
                 audio.clear_pictures()
                 audio.add_picture(pic)
 
@@ -118,10 +135,12 @@ class AudioTagger:
             if album.genre:
                 audio["\xa9gen"] = [album.genre]
 
-            # Embed cover art
+            # Embed cover art with accurate format atom header for Windows Media Player
             if cover_image_path and cover_image_path.exists():
                 image_data = cover_image_path.read_bytes()
-                audio["covr"] = [MP4Cover(image_data, imageformat=MP4Cover.FORMAT_JPEG)]
+                is_png = image_data.startswith(b"\x89PNG\r\n\x1a\n")
+                fmt = MP4Cover.FORMAT_PNG if is_png else MP4Cover.FORMAT_JPEG
+                audio["covr"] = [MP4Cover(image_data, imageformat=fmt)]
 
             audio.save()
             return True
