@@ -2,7 +2,7 @@
 
 | Status | Version | Date | Target Platforms |
 | :--- | :--- | :--- | :--- |
-| **Approved / Active** | `0.9.2` | October 2026 | Windows 10 / 11 (64-bit) |
+| **Approved / Active** | `0.9.3` | October 2026 | Windows 10 / 11 (64-bit) |
 
 ---
 

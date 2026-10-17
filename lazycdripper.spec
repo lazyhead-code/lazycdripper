@@ -17,7 +17,7 @@ assets_dir = project_root / "assets"
 
 # Data files to bundle inside the application
 datas = []
-for img_name in ["logo.jpg", "logo.ico", "icon.png", "sloth_complete.jpg", "sloth_sad.jpg"]:
+for img_name in ["logo.jpg", "logo.ico", "icon.png", "sloth_complete.jpg", "sloth_sad.jpg", "store_icon_tight.jpg", "store_icon.jpg"]:
     img_file = assets_dir / "images" / img_name
     if img_file.is_file():
         datas.append((str(img_file), "assets/images"))

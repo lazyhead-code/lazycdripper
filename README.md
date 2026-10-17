@@ -39,6 +39,14 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 
 ## Release Notes
 
+### v0.9.3 — *"Peace... Like a River"* (October 2026)
+- **Human-Friendly Quality Clarifications:** Clarified codec selections for everyday audiophiles—FLAC Lossless labeled as *"Perfect CD copy"* and AAC Lossy as *"Compressed but still great"*—while preserving exact encoder flags and bitrates for those who care.
+- **Central-Axis Alignment & Layout Clamping:** Centered all active ripping and completion screens along a strict vertical axis (`Qt.AlignCenter`), eliminated element drift when expanding or maximizing the window, and guaranteed custom window dimensions persist seamlessly across all screen transitions.
+- **Tactile 3D Mascot Medallions:** Added crafted 3D pewter and gunmetal rock sloth medallions with a knurled bezel for completion states (Happy thumbs-up for bit-perfect/recovered rips, and Sad thumbs-down for scratched disc surface damage), rendered at 0.96 scale factor to prevent edge clipping.
+- **Session-Wide Error Telemetry:** Unified real-time sector error and retry tracking across individual tracks and final verdict summaries with three-state LED status signaling (Pristine Green, Amber Warning, Crimson Error).
+- **Windows Store Mascot Icon Assets:** Designed high-contrast 1024×1024 metallic rock sloth mascot icon (`store_icon_tight.jpg`) featuring holographic rainbow CD reflections across his sunglasses, optimized for high visibility at small store tile sizes.
+- **Design System Style Guide:** Published comprehensive UI specification and layout rules in `STYLE_GUIDE.md`.
+
 ### v0.9.2 — *"Peace... Like a River"* (October 2026)
 - **Real-Time Drive Speed:** Wired up dynamic sector-rate speed measurement (75 sectors/sec) in the Windows extraction engine, actively signaling drive read speed (`Reading disc  •  14.2x`).
 - **Telemetry Cleanup:** Removed obsolete 1990s "Jitter Align" telemetry badge in favor of clean, reassuring sector error and retry monitoring.
