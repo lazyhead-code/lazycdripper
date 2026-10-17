@@ -50,7 +50,7 @@ On the active ripping screen and both completion screens (success and failure), 
                                   │
                ┌─────────────────────────────────────┐
                │    📁 [FLAC] - Perfect CD copy      │  <-- Centered sister folder
-               │ 📁 [AAC] - Compressed but still great│  <-- Centered sister folder
+               │ 📁 [MP3] - Compressed but still great│  <-- Centered sister folder
                └─────────────────────────────────────┘
                                   │
                                 16px (Fixed spacing)
@@ -68,7 +68,7 @@ On the active ripping screen and both completion screens (success and failure), 
 - [x] **Progress Bars (`track_bar`, `overall_bar`):** Centered with percentage text centered inside the bar.
 - [x] **Telemetry Pills (`badge_retries`, `badge_errors`):** Centered in horizontal row.
 - [x] **Memories Ticker Card (`memory_card`):** Centered text with italicized warm amber styling.
-- [x] **Sister Directories Card (`output_card`):** Inner layout centered; both FLAC and AAC labels set to `Qt.AlignCenter`.
+- [x] **Sister Directories Card (`output_card`):** Inner layout centered; both FLAC and MP3 labels set to `Qt.AlignCenter`.
 - [x] **Action Buttons (`comp_btn_row`):** Centered horizontally side-by-side.
 
 ---
@@ -147,12 +147,12 @@ Plain English for regular human clarity combined with precision technical parame
 | Audio Format | Full UI Title | Subtitle / Specification Wording |
 | :--- | :--- | :--- |
 | **FLAC Lossless** | **`FLAC LOSSLESS (Perfect CD copy)`** | Audio CD 16-bit / 44.1 kHz bit-perfect master.<br>Archival compression (Level 8) with MD5 stream verify. |
-| **AAC Lossy** | **`AAC LOSSY (Compressed but still great)`** | Fraunhofer FDK-AAC (VBR Mode 5 / 256k in .m4a).<br>Native Bluetooth codec (avoids cross-codec transcode artifacts). |
+| **MP3 Lossy** | **`MP3 LOSSY (Compressed but still great)`** | LAME Constant Bitrate (CBR 320 kbps, `-q:a 0`).<br>100% patent-free worldwide, universal automotive and device compatibility. |
 
 ### 6.1 Output Sister Folder Naming Standard
 ```text
 📁  Artist - Album (Year) [FLAC] - Perfect CD copy (383.7 MB)
-📁  Artist - Album (Year) [AAC] - Compressed but still great (106.4 MB)
+📁  Artist - Album (Year) [MP3] - Compressed but still great (106.4 MB)
 ```
 
 ---

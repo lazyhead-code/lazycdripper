@@ -41,8 +41,8 @@ The application operates on a single unified master console:
     - Fixed 280px hardware column width (non-stretching).
     - **Integrated Brand Faceplate Plaque:** Architectural typography `LAZY CD RIPPER` (16px, bold 800, `#FF9E3B`, letter-spacing 2px) and audiophile manifesto `AN ALBUM IS AN EXPERIENCE, NOT A STREAM` (9px, 600, `#727180`, letter-spacing 1.2px) seated directly atop the rack. Eliminates horizontal top-bar overhead to reclaim ~56px of vertical space.
     - Machined circular anodized aluminum CD platter with concentric grooves and amber spindle diode (`TRAY READY • NO DISC`) / Jewel-case frame.
-    - Master Rip Push Button: Constant label `"Rip to FLAC + AAC"`. Dimmed/grayed out in standby or during background queries; illuminates into radiant warm amber/orange glow when disc is loaded and ready.
-    - Engineering policy note: Dual rip FLAC + AAC specification.
+    - Master Rip Push Button: Constant label `"Rip to FLAC + MP3"`. Dimmed/grayed out in standby or during background queries; illuminates into radiant warm amber/orange glow when disc is loaded and ready.
+    - Engineering policy note: Dual rip FLAC + MP3 specification.
   - **Right Deck (Master Recording Roster):**
     - Metadata Header: Ultra-clean single point-of-truth card communicating clear hardware and media status, horizontally aligned with the brand faceplate on the left deck.
     - Track Table: Clean 4-column table (`#`, `Title`, `Artist`, `Time`), expanding to full vertical height to display 12–16 tracks at standard window size without scrolling.
@@ -55,8 +55,8 @@ The application operates on a single unified master console:
   - Metadata header updates with Artist tag (`#FF9E3B`), Album Title (`#F2F1EC`), and specs (Year • Tracks • Duration • Genre).
   - Provenance badge clearly communicates source: `Metadata: MusicBrainz • Artwork: Cover Art Archive` (or `Source: Optical CD TOC (Unindexed)` in offline mode).
   - Track Table smoothly populates with track numbers, titles, artists, and durations.
-  - Master Rip Button lights up in rich vacuum tube amber (`Rip to FLAC + AAC`).
-  - Clicking "Rip to FLAC + AAC" prompts the user for the destination directory on demand.
+  - Master Rip Button lights up in rich vacuum tube amber (`Rip to FLAC + MP3`).
+  - Clicking "Rip to FLAC + MP3" prompts the user for the destination directory on demand.
 
 ### 2.2 Active Ripping & In-Screen Completion Deck
 The application transitions seamlessly in-place from the Master Console to the central Ripping View without opening detached modal dialogs:
@@ -77,7 +77,7 @@ The application transitions seamlessly in-place from the Master Console to the c
   - Centered multi-line summary breakdown bullets (`human_readable_summary`).
   - Output Sister Directories Card: Centered card displaying clean human-readable output folder paths:
     - `📁  Artist - Album (Year) [FLAC] - Perfect CD copy (X.X MB)`
-    - `📁  Artist - Album (Year) [AAC] - Compressed but still great (Y.Y MB)`
+    - `📁  Artist - Album (Year) [MP3] - Compressed but still great (Y.Y MB)`
   - Centered action buttons: `Open Rip Folder` and `Done` (returns to Master Console).
 
 ### 2.3 Style & Layout Design System Reference
@@ -96,9 +96,9 @@ MainWindow
     │   │   ├── BrandFaceplatePlaque ("LAZY CD RIPPER" + "AN ALBUM IS AN EXPERIENCE, NOT A STREAM")
     │   │   ├── ArtworkCardWidget (Machined Platter / Jewel Case)
     │   │   ├── StretchSpacer
-    │   │   ├── PrimaryRipButton ("Rip to FLAC + AAC")
+    │   │   ├── PrimaryRipButton ("Rip to FLAC + MP3")
     │   │   └── PolicyContainer
-    │   │       ├── EngineeringPolicyNote ("Dual rip: [FLAC Master] + [AAC Mobile @ 256k]")
+    │   │       ├── EngineeringPolicyNote ("Dual rip: [FLAC Master] + [MP3 320k]")
     │   │       └── ChassisVersionLabel ("v0.9.3 • Peace... Like a River • Credits" clickable serial plate)
     │   └── RightDeck (Master Recording Roster)
     │       ├── MetadataHeaderCard (Unified status: No Drive -> Insert audio CD -> Fetching Metadata -> Album Title)
@@ -117,6 +117,6 @@ MainWindow
 * **Window Size Preservation:** Window dimensions are strictly preserved across all page transitions (never resets to 1020×700 on navigation).
 * **Metadata & Artwork Provenance / Source Transparency:** Provenance badge displays source origins (`Metadata: MusicBrainz • Artwork: Cover Art Archive`). Canonical front covers selected via Release Group heuristic ranking.
 * **Tactile Mascot Medallions:** Cast pewter and dark gunmetal 3D rock sloth mascot medallions (Happy thumbs-up and Sad thumbs-down) framed in a machined knurled bezel with 0.96 scale factor to prevent edge clipping.
-* **Human-Readable Quality Terminology:** FLAC labeled as `Perfect CD copy` and AAC labeled as `Compressed but still great`, keeping technical parameters available for audiophiles who care.
+* **Human-Readable Quality Terminology:** FLAC labeled as `Perfect CD copy` and MP3 labeled as `Compressed but still great`, keeping technical parameters available for audiophiles who care.
 
 

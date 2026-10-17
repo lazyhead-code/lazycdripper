@@ -18,11 +18,11 @@ Lazy CD Ripper follows a **Decoupled Engine-Presenter Architecture**. The core a
 │           (Job Coordinator, State Machine, Thread Management)          │
 ├───────────────────┬───────────────────┬────────────────────────────────┤
 │   Disc Subsystem  │ Metadata Engine   │       Encoding Subsystem       │
-│  (TOC, DiscID,    │ (MusicBrainz API, │ (WAV Buffer, FFmpeg FLAC/AAC,  │
+│  (TOC, DiscID,    │ (MusicBrainz API, │ (WAV Buffer, FLAC/MP3 Encoders,│
 │   Win32 CDDA)     │  CoverArtArchive) │  Multi-threading, Validation)  │
 ├───────────────────┴───────────────────┴────────────────────────────────┤
 │                     Tagging & File Management                          │
-│               (Mutagen Vorbis/MP4, Path Sanitizer)                     │
+│               (Mutagen Vorbis/ID3v2, Path Sanitizer)                   │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -60,25 +60,27 @@ Lazy CD Ripper follows a **Decoupled Engine-Presenter Architecture**. The core a
 
 ### 2.4 `lazycdripper.encoder` (Transcoding Engine)
 * **Final Implementation:**
-  * Transcodes scratch WAV buffers into FLAC and AAC using `ffmpeg.exe`.
+  * Transcodes scratch WAV buffers into FLAC and MP3 using dedicated standalone CLI encoders.
   * **Encoding Parameters:**
-    * **FLAC:** `-c:a flac -compression_level 8 -verify` (lossless master).
-    * **AAC:** `-c:a libfdk_aac -vbr 5` with transparent fallback to `-c:a aac -b:a 256k` (perceptually transparent AAC-LC).
-  * **Binary Resolution & Auto-Downloader:**
-    * Bundles static `bin/ffmpeg.exe` for portable releases.
-    * Checks local paths, `%LOCALAPPDATA%\lazycdripper\bin`, and system `PATH`.
-    * If missing, `ensure_ffmpeg()` silently downloads a verified static `ffmpeg.exe` build in a background daemon thread upon launch.
+    * **FLAC:** `flac.exe -8 --verify "<input.wav>" -o "<output.flac>"` (or `-compression_level 8 -verify` via fallback) — Lossless bit-perfect master archive.
+    * **MP3:** `lame.exe -b 320 -q 0 "<input.wav>" "<output.mp3>"` (or `-b:a 320k -q:a 0` via fallback) — Constant Bitrate (CBR) 320 kbps with maximum psychoacoustic quality model (`-q 0`).
+  * **Zero Console Window Execution (`CREATE_NO_WINDOW`):**
+    * All encoder subprocesses on Windows are invoked with `creationflags=subprocess.CREATE_NO_WINDOW` (`0x08000000`). This completely eliminates console window flicker / black boxes, running encoders silently and invisibly in the background.
+  * **Option A: Official Dedicated Standalone Binaries:**
+    * Bundles official, lightweight, open-source binaries: Xiph.org `flac.exe` (~1.5 MB, BSD) and RareWares/LAME `lame.exe` (~800 KB, LGPL).
+    * Total bundled binary footprint is **under 2.5 MB** (compared to ~80 MB for full FFmpeg).
+    * Zero AAC or video codec code exists in either binary, guaranteeing 100% patent-free legal distribution.
 * **Motivation:**
-  * FFmpeg is the undisputed industry standard for rock-solid audio encoding. By providing static bundling plus an automated fallback download, users never experience missing codec errors or setup friction.
+  * Dedicated standalone encoders (`flac.exe` and `lame.exe`) are the gold standard of the audiophile community (used by Exact Audio Copy and CUERipper). They drastically shrink the distributable archive size, completely insulate the project from AAC patent claims, and run with zero console flashing via `CREATE_NO_WINDOW`.
 
 ### 2.5 `lazycdripper.tagger` (Metadata & Artwork Embedding)
 * **Final Implementation:**
   * Pure Python tagging via `mutagen`.
   * Writes Vorbis comment blocks and FLAC Picture block type 3 (Front Cover) to `.flac`.
-  * Writes MP4 atoms (`©nam`, `©ART`, `©alb`, `©day`, `trkn`, `disk`, `covr`) to `.m4a`.
-  * Emits companion `cover.jpg` for media server and Windows Explorer folder preview caching.
+  * Writes ID3v2.3 tags (`TIT2`, `TPE1`, `TPE2`, `TALB`, `TYER`, `TRCK`, `TPOS`, `TCON`, `TXXX:MusicBrainz DiscID`) and `APIC` frame (Cover Front, `image/jpeg`) to `.mp3`.
+  * Emits companion `cover.jpg` directly inside the album root directory and inside each `Disc NN` subfolder for multi-disc sets.
 * **Motivation:**
-  * Manipulating audio tags directly in memory via `mutagen` is drastically faster and cleaner than shelling out to external tools like `metaflac` or `AtomicParsley`.
+  * ID3v2.3 is universally recognized across Windows Explorer, Windows Media Player, car head units, Apple iOS, Android, and media servers. Manipulating tags directly in memory via `mutagen` guarantees atomic tag writes and instantaneous performance without spawning external CLI tagging tools.
 
 ### 2.6 `lazycdripper.gui` (User Interface)
 * **Final Implementation:**
@@ -108,7 +110,7 @@ User               GUI / Pipeline              Win32 CDDA Engine       MusicBrai
  │                       ├─ Extract Track to WAV ────►│                         │                            │
  │                       │◄─ Progress / Sectors ──────┤                         │                            │
  │                       │                                                                                   │
- │                       ├─ Transcode WAV -> FLAC/AAC ──────────────────────────────────────────────────────►│
+ │                       ├─ Transcode WAV -> FLAC/MP3 ──────────────────────────────────────────────────────►│
  │                       ├─ Write Tags & Embed Artwork ─────────────────────────────────────────────────────►│
  │                       │◄─ Track Completed ────────────────────────────────────────────────────────────────┤
  │                       │                                                                                   │
@@ -123,7 +125,7 @@ To maintain code reliability and eliminate regression bugs when adding features,
 
 | Test Type | Scope | How It's Executed |
 | :--- | :--- | :--- |
-| **Unit Tests** | Path sanitization, DiscID hashing, Vorbis/MP4 tag mapping, filename formatting. | Pure Python tests with standard library `unittest`, fast (< 1s), zero external dependencies. |
+| **Unit Tests** | Path sanitization, DiscID hashing, Vorbis/ID3v2 tag mapping, filename formatting. | Pure Python tests with standard library `unittest`, fast (< 1s), zero external dependencies. |
 | **Integration Tests** | Metadata queries and cover art fetching against recorded responses (mock fixtures). | `unittest` with mocked HTTP responses simulating standard, multi-disc, and ambiguous releases. |
-| **Audio Pipeline Tests** | WAV generation, FFmpeg FLAC/AAC transcoding, and tag validation using test audio samples. | Synthetic 1-second WAV files generated in-memory, transcoded, and verified with `mutagen`. |
+| **Audio Pipeline Tests** | WAV generation, FLAC/MP3 transcoding, and tag validation using test audio samples. | Synthetic 1-second WAV files generated in-memory, transcoded, and verified with `mutagen`. |
 | **Mock Disc Tests** | Simulating optical drive states (no disc, audio disc, data disc, scratch error). | Mock classes implementing `MockRipper`. |
