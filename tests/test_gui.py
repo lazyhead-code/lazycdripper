@@ -783,7 +783,7 @@ class TestTrackTableWidget(unittest.TestCase):
         if not HAVE_QT:
             self.skipTest("PySide6 not available in this environment")
 
-        from PySide6.QtWidgets import QApplication
+        from PySide6.QtWidgets import QApplication, QFrame
         from lazycdripper.core.models import AlbumRipReport, TrackRipReport
         app = QApplication.instance() or QApplication([])
 
@@ -913,6 +913,7 @@ class TestTrackTableWidget(unittest.TestCase):
             self.skipTest("PySide6 not available in this environment")
 
         from pathlib import Path
+        from PySide6.QtCore import Qt
         from PySide6.QtWidgets import QApplication
         from lazycdripper.core.models import AlbumRipReport, TrackRipReport, AlbumInfo
 
