@@ -1017,7 +1017,7 @@ class TestTrackTableWidget(unittest.TestCase):
         # Test set_album resets view
         view.show_completion(scratched_rep)
         self.assertTrue(view.completion_container.isVisible())
-        view.set_album(AlbumInfo(title="New Album", artist="New Artist"))
+        view.set_album(AlbumInfo(title="New Album", artist="New Artist", album_artist="New Artist"))
         self.assertTrue(view.active_container.isVisible())
         self.assertFalse(view.completion_container.isVisible())
 

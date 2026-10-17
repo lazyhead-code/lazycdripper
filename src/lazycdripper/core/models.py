@@ -43,7 +43,7 @@ class AlbumInfo:
     """Complete metadata for an audio CD release."""
     title: str
     artist: str
-    album_artist: str
+    album_artist: str = ""
     year: Optional[int] = None
     total_tracks: int = 0
     disc_number: int = 1
@@ -55,6 +55,10 @@ class AlbumInfo:
     tracks: List[TrackInfo] = field(default_factory=list)
     artwork_candidates: List[ArtworkCandidate] = field(default_factory=list)
     selected_artwork: Optional[ArtworkCandidate] = None
+
+    def __post_init__(self) -> None:
+        if not self.album_artist and self.artist:
+            self.album_artist = self.artist
 
 
 @dataclass

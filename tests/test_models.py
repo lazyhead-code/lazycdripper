@@ -28,6 +28,10 @@ class TestModels(unittest.TestCase):
         self.assertEqual(len(album.tracks), 2)
         self.assertEqual(album.tracks[0].title, "Come Together")
 
+        # AlbumInfo without explicit album_artist should default to artist
+        album2 = AlbumInfo(title="Help!", artist="The Beatles")
+        self.assertEqual(album2.album_artist, "The Beatles")
+
     def test_artwork_candidate(self):
         art = ArtworkCandidate(
             image_id="12345",
