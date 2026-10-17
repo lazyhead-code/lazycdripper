@@ -160,11 +160,11 @@ class CompletionDialog(QDialog if HAVE_QT else object):
 
             flac_title = self.report.flac_directory.name if self.report.flac_directory else "[FLAC]"
             aac_title = self.report.aac_directory.name if self.report.aac_directory else "[AAC]"
-            flac_label = QLabel(f"📁  {flac_title} - Lossless Archive ({flac_mb:.1f} MB)")
+            flac_label = QLabel(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
             flac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
             output_box.addWidget(flac_label)
 
-            aac_label = QLabel(f"📁  {aac_title} - Mobile Library ({aac_mb:.1f} MB)")
+            aac_label = QLabel(f"📁  {aac_title} - Compressed but still great ({aac_mb:.1f} MB)")
             aac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
             output_box.addWidget(aac_label)
 

@@ -408,6 +408,8 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.visual_frame.setObjectName("rippingBanner")
         self.visual_frame.setMinimumWidth(640)
         self.visual_frame.setMaximumWidth(760)
+        if HAVE_QT:
+            self.visual_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.visual_frame.setStyleSheet(
             "QFrame#rippingBanner { "
             "  background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 rgba(28, 24, 20, 0.72), stop:1 rgba(16, 16, 22, 0.76)); "
@@ -492,39 +494,66 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.status_sub.setWordWrap(False)
         visual_layout.addWidget(self.status_sub, alignment=Qt.AlignCenter)
 
-        main_layout.addWidget(self.visual_frame)
+        main_layout.addWidget(self.visual_frame, alignment=Qt.AlignCenter)
 
         # Active Progress Container (visible during active ripping)
         self.active_container = QWidget()
         self.active_container.setMinimumWidth(640)
         self.active_container.setMaximumWidth(760)
+        if HAVE_QT:
+            self.active_container.setFixedHeight(214)
+            self.active_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         active_box = QVBoxLayout(self.active_container)
         active_box.setContentsMargins(0, 0, 0, 0)
-        active_box.setSpacing(16)
+        active_box.setSpacing(0)
+        active_box.setAlignment(Qt.AlignCenter)
 
-        # 1. Current Track & Album Progress
+        # 1. Current Track & Album Progress (Fixed spacing so distance never stretches on resize)
         progress_box = QVBoxLayout()
-        progress_box.setSpacing(10)
+        progress_box.setContentsMargins(0, 0, 0, 0)
+        progress_box.setSpacing(0)
 
         self.track_label = QLabel("Extracting")
         self.track_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #F3F4F6;")
+        self.track_label.setAlignment(Qt.AlignCenter)
+        if HAVE_QT:
+            self.track_label.setFixedHeight(18)
         progress_box.addWidget(self.track_label)
+
+        if HAVE_QT:
+            progress_box.addSpacing(6)
 
         self.track_bar = QProgressBar()
         self.track_bar.setRange(0, 100)
         self.track_bar.setValue(0)
+        if HAVE_QT:
+            self.track_bar.setFixedHeight(16)
         progress_box.addWidget(self.track_bar)
+
+        if HAVE_QT:
+            progress_box.addSpacing(10)
 
         self.overall_label = QLabel("Overall Album: 0%")
         self.overall_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #F3F4F6;")
+        self.overall_label.setAlignment(Qt.AlignCenter)
+        if HAVE_QT:
+            self.overall_label.setFixedHeight(18)
         progress_box.addWidget(self.overall_label)
+
+        if HAVE_QT:
+            progress_box.addSpacing(6)
 
         self.overall_bar = QProgressBar()
         self.overall_bar.setRange(0, 100)
         self.overall_bar.setValue(0)
+        if HAVE_QT:
+            self.overall_bar.setFixedHeight(16)
         progress_box.addWidget(self.overall_bar)
 
         active_box.addLayout(progress_box)
+
+        if HAVE_QT:
+            active_box.addSpacing(14)
 
         # 2. Telemetry Status Pills
         telemetry_row = QHBoxLayout()
@@ -533,13 +562,20 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         self.badge_retries = QLabel("🟢 Retries: 0")
         self.badge_retries.setStyleSheet("background: #1A1A22; color: #10B981; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;")
+        if HAVE_QT:
+            self.badge_retries.setFixedHeight(24)
         telemetry_row.addWidget(self.badge_retries)
 
         self.badge_errors = QLabel("🟢 Errors: 0")
         self.badge_errors.setStyleSheet("background: #1A1A22; color: #10B981; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;")
+        if HAVE_QT:
+            self.badge_errors.setFixedHeight(24)
         telemetry_row.addWidget(self.badge_errors)
 
         active_box.addLayout(telemetry_row)
+
+        if HAVE_QT:
+            active_box.addSpacing(14)
 
         # 3. Nostalgic Memories Ticker Card
         self.memory_card = QFrame()
@@ -559,15 +595,18 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         mem_layout.addWidget(self.memory_label)
 
         active_box.addWidget(self.memory_card)
-        main_layout.addWidget(self.active_container)
+        main_layout.addWidget(self.active_container, alignment=Qt.AlignCenter)
 
         # Completion Container (replaces active container when rip finishes)
         self.completion_container = QWidget()
         self.completion_container.setMinimumWidth(640)
         self.completion_container.setMaximumWidth(760)
+        if HAVE_QT:
+            self.completion_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         comp_box = QVBoxLayout(self.completion_container)
         comp_box.setContentsMargins(0, 0, 0, 0)
         comp_box.setSpacing(16)
+        comp_box.setAlignment(Qt.AlignCenter)
 
         # Output Sister Directories Card
         self.output_card = QFrame()
@@ -577,13 +616,16 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         )
         out_layout = QVBoxLayout(self.output_card)
         out_layout.setSpacing(10)
-        self.flac_dir_label = QLabel("📁 [FLAC] - Lossless Archive")
+        out_layout.setAlignment(Qt.AlignCenter)
+        self.flac_dir_label = QLabel("📁 [FLAC] - Perfect CD copy")
         self.flac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
-        out_layout.addWidget(self.flac_dir_label)
-        self.aac_dir_label = QLabel("📁 [AAC] - Mobile Library")
+        self.flac_dir_label.setAlignment(Qt.AlignCenter)
+        out_layout.addWidget(self.flac_dir_label, alignment=Qt.AlignCenter)
+        self.aac_dir_label = QLabel("📁 [AAC] - Compressed but still great")
         self.aac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
-        out_layout.addWidget(self.aac_dir_label)
-        comp_box.addWidget(self.output_card)
+        self.aac_dir_label.setAlignment(Qt.AlignCenter)
+        out_layout.addWidget(self.aac_dir_label, alignment=Qt.AlignCenter)
+        comp_box.addWidget(self.output_card, alignment=Qt.AlignCenter)
 
         # Action Buttons Row
         comp_btn_row = QHBoxLayout()
@@ -611,7 +653,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         comp_box.addLayout(comp_btn_row)
 
         self.completion_container.setVisible(False)
-        main_layout.addWidget(self.completion_container)
+        main_layout.addWidget(self.completion_container, alignment=Qt.AlignCenter)
 
     def show_completion(self, report: AlbumRipReport, on_done: Optional[Callable[[], None]] = None):
         """Transition the ripping view directly into the completion summary screen."""
@@ -641,7 +683,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             f"font-size: 18px; font-weight: 700; color: {title_color}; padding: 2px 4px; min-height: 24px;"
         )
         self.status_sub.setStyleSheet("font-size: 13px; color: #D1D5DB;")
-        self.status_sub.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.status_sub.setAlignment(Qt.AlignCenter)
         self.status_sub.setWordWrap(False)
         self.status_sub.setText(report.human_readable_summary)
 
@@ -650,8 +692,10 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             aac_mb = report.aac_size_bytes / (1024 * 1024)
             flac_title = report.flac_directory.name if report.flac_directory else "[FLAC]"
             aac_title = report.aac_directory.name if report.aac_directory else "[AAC]"
-            self.flac_dir_label.setText(f"📁  {flac_title} - Lossless Archive ({flac_mb:.1f} MB)")
-            self.aac_dir_label.setText(f"📁  {aac_title} - Mobile Library ({aac_mb:.1f} MB)")
+            self.flac_dir_label.setText(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
+            self.aac_dir_label.setText(f"📁  {aac_title} - Compressed but still great ({aac_mb:.1f} MB)")
+            self.flac_dir_label.setAlignment(Qt.AlignCenter)
+            self.aac_dir_label.setAlignment(Qt.AlignCenter)
             self.output_card.setVisible(True)
             self.btn_open_rip.setVisible(bool(report.rip_folder))
         else:

@@ -100,7 +100,7 @@ class RipPipelineOrchestrator:
             for idx, track in enumerate(album.tracks, start=1):
                 scratch_wav = scratch_dir / f"track_{track.track_number:02d}_scratch.wav"
 
-                # Setup track-level progress tracking
+                # Setup track-level progress tracking with cumulative album counts
                 current_track_progress = RipProgress(
                     current_track=track.track_number,
                     total_tracks=total_tracks,
@@ -108,6 +108,9 @@ class RipPipelineOrchestrator:
                     overall_percent=((idx - 1) / total_tracks) * 100.0,
                     status_message="Extracting track...",
                     track_title=track.title,
+                    read_retries=overall_retries,
+                    unrecoverable_errors=overall_errors,
+                    jitter_corrections=overall_jitter,
                 )
                 if on_progress:
                     on_progress(current_track_progress)
@@ -120,8 +123,20 @@ class RipPipelineOrchestrator:
                     completed = idx - 1
                     current_contrib = p.track_percent / 100.0
                     p.overall_percent = ((completed + current_contrib) / total_tracks) * 100.0
+                    cumulative_p = RipProgress(
+                        current_track=p.current_track,
+                        total_tracks=p.total_tracks,
+                        track_percent=p.track_percent,
+                        overall_percent=p.overall_percent,
+                        status_message=p.status_message,
+                        read_retries=overall_retries + p.read_retries,
+                        unrecoverable_errors=overall_errors + p.unrecoverable_errors,
+                        jitter_corrections=overall_jitter + p.jitter_corrections,
+                        current_speed=p.current_speed,
+                        track_title=p.track_title,
+                    )
                     if on_progress:
-                        on_progress(p)
+                        on_progress(cumulative_p)
 
                 # A. Extract track from optical CD to WAV
                 rip_ok = self.ripper.rip_track(
@@ -132,20 +147,37 @@ class RipPipelineOrchestrator:
                     on_progress=ripper_callback,
                 )
 
+                # Track-level telemetry counts
+                track_jitter = current_track_progress.jitter_corrections
+                track_retries = current_track_progress.read_retries
+                track_errors = current_track_progress.unrecoverable_errors
+
                 # Accumulate error telemetry
-                overall_jitter += current_track_progress.jitter_corrections
-                overall_retries += current_track_progress.read_retries
-                overall_errors += current_track_progress.unrecoverable_errors
+                overall_jitter += track_jitter
+                overall_retries += track_retries
+                overall_errors += track_errors
 
                 # Determine track-level integrity status
                 if not rip_ok or not scratch_wav.exists():
                     track_status = "failed"
-                    if current_track_progress.unrecoverable_errors == 0:
-                        current_track_progress.unrecoverable_errors = 1
+                    if track_errors == 0:
+                        track_errors = 1
                         overall_errors += 1
-                elif current_track_progress.unrecoverable_errors > 0:
+                    if on_progress:
+                        on_progress(RipProgress(
+                            current_track=track.track_number,
+                            total_tracks=total_tracks,
+                            track_percent=current_track_progress.track_percent,
+                            overall_percent=(idx / total_tracks) * 100.0,
+                            status_message=f"Track {track.track_number} extraction failed",
+                            read_retries=overall_retries,
+                            unrecoverable_errors=overall_errors,
+                            jitter_corrections=overall_jitter,
+                            track_title=track.title,
+                        ))
+                elif track_errors > 0:
                     track_status = "damaged"
-                elif current_track_progress.read_retries > 0:
+                elif track_retries > 0:
                     track_status = "recovered"
                 else:
                     track_status = "pristine"
@@ -183,14 +215,17 @@ class RipPipelineOrchestrator:
                 if rip_ok and scratch_wav.exists():
                     # Notify UI: Dual-encoding started
                     if on_progress:
-                        current_track_progress.track_percent = 100.0
-                        current_track_progress.overall_percent = (idx / total_tracks) * 100.0
-                        current_track_progress.status_message = (
-                            "Transcoding: Lossless FLAC + 256k AAC..."
-                        )
-                        current_track_progress.current_speed = ""
-                        current_track_progress.track_title = track.title
-                        on_progress(current_track_progress)
+                        on_progress(RipProgress(
+                            current_track=track.track_number,
+                            total_tracks=total_tracks,
+                            track_percent=100.0,
+                            overall_percent=(idx / total_tracks) * 100.0,
+                            status_message="Transcoding: Lossless FLAC + 256k AAC...",
+                            read_retries=overall_retries,
+                            unrecoverable_errors=overall_errors,
+                            jitter_corrections=overall_jitter,
+                            track_title=track.title,
+                        ))
 
                     # B. Parallel Dual-Transcode (FLAC + AAC)
                     flac_ok, aac_ok = self.encoder.encode_dual(
@@ -218,24 +253,35 @@ class RipPipelineOrchestrator:
                             aac_valid,
                         )
                         track_status = "failed"
-                        current_track_progress.unrecoverable_errors += 1
+                        track_errors += 1
                         overall_errors += 1
                         if on_progress:
-                            current_track_progress.status_message = (
-                                f"Encoding failed for Track {track.track_number}"
-                            )
-                            current_track_progress.track_title = track.title
-                            on_progress(current_track_progress)
+                            on_progress(RipProgress(
+                                current_track=track.track_number,
+                                total_tracks=total_tracks,
+                                track_percent=100.0,
+                                overall_percent=(idx / total_tracks) * 100.0,
+                                status_message=f"Encoding failed for Track {track.track_number}",
+                                read_retries=overall_retries,
+                                unrecoverable_errors=overall_errors,
+                                jitter_corrections=overall_jitter,
+                                track_title=track.title,
+                            ))
 
                     # C. Metadata & Artwork Tagging (only for valid files)
                     if flac_valid or aac_valid:
                         if on_progress:
-                            current_track_progress.status_message = (
-                                "Embedding metadata & cover art..."
-                            )
-                            current_track_progress.current_speed = ""
-                            current_track_progress.track_title = track.title
-                            on_progress(current_track_progress)
+                            on_progress(RipProgress(
+                                current_track=track.track_number,
+                                total_tracks=total_tracks,
+                                track_percent=100.0,
+                                overall_percent=(idx / total_tracks) * 100.0,
+                                status_message="Embedding metadata & cover art...",
+                                read_retries=overall_retries,
+                                unrecoverable_errors=overall_errors,
+                                jitter_corrections=overall_jitter,
+                                track_title=track.title,
+                            ))
 
                     if flac_valid:
                         self.tagger.tag_track(
@@ -255,10 +301,17 @@ class RipPipelineOrchestrator:
                         )
 
                     if on_progress:
-                        current_track_progress.status_message = (
-                            f"Track {track.track_number} complete"
-                        )
-                        on_progress(current_track_progress)
+                        on_progress(RipProgress(
+                            current_track=track.track_number,
+                            total_tracks=total_tracks,
+                            track_percent=100.0,
+                            overall_percent=(idx / total_tracks) * 100.0,
+                            status_message=f"Track {track.track_number} complete",
+                            read_retries=overall_retries,
+                            unrecoverable_errors=overall_errors,
+                            jitter_corrections=overall_jitter,
+                            track_title=track.title,
+                        ))
 
                     # D. Delete scratch WAV immediately to conserve disk space
                     try:
@@ -271,9 +324,9 @@ class RipPipelineOrchestrator:
                         track_number=track.track_number,
                         title=track.title,
                         status=track_status,
-                        jitter_corrections=current_track_progress.jitter_corrections,
-                        read_retries=current_track_progress.read_retries,
-                        unrecoverable_errors=current_track_progress.unrecoverable_errors,
+                        jitter_corrections=track_jitter,
+                        read_retries=track_retries,
+                        unrecoverable_errors=track_errors,
                         flac_path=flac_dest if flac_dest.exists() else None,
                         aac_path=aac_dest if aac_dest.exists() else None,
                     )

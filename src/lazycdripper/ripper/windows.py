@@ -189,6 +189,10 @@ class WindowsCddaRipper:
                             "Batch read failed at sector %d (LBA %d, count %d) on %s (Win32 err %d). Falling back to single-sector reads...",
                             cur_sector_offset, lba, cur_sectors, dev_path, err_code,
                         )
+                        if on_progress:
+                            pct = (sectors_read / length_sectors) * 100.0
+                            progress.track_percent = min(100.0, pct)
+                            on_progress(progress)
 
                         # Sector-by-sector fallback for this batch
                         batch_aborted = False
@@ -207,6 +211,10 @@ class WindowsCddaRipper:
                             for retry_attempt in range(3):
                                 if retry_attempt > 0:
                                     progress.read_retries += 1
+                                    if on_progress:
+                                        pct = (sectors_read / length_sectors) * 100.0
+                                        progress.track_percent = min(100.0, pct)
+                                        on_progress(progress)
                                 single_ok = ctypes.windll.kernel32.DeviceIoControl(
                                     h_device,
                                     IOCTL_CDROM_RAW_READ,
@@ -235,6 +243,10 @@ class WindowsCddaRipper:
                                 # Pad missing sector with silence to maintain track timing
                                 pcm_chunks.append(b"\x00" * SECTOR_SIZE_RAW)
                                 sectors_read += 1
+                                if on_progress:
+                                    pct = (sectors_read / length_sectors) * 100.0
+                                    progress.track_percent = min(100.0, pct)
+                                    on_progress(progress)
 
                                 # Circuit breaker: continuous read failures (e.g. drive disconnected/inaccessible)
                                 if consecutive_errors >= 20:
@@ -270,6 +282,8 @@ class WindowsCddaRipper:
                         "Track %d extraction aborted early: read %d/%d sectors (%d unrecoverable errors)",
                         track_number, sectors_read, length_sectors, progress.unrecoverable_errors,
                     )
+                    pct = (sectors_read / length_sectors) * 100.0
+                    progress.track_percent = min(100.0, pct)
                     if on_progress:
                         progress.status_message = f"Track {track_number} extraction failed"
                         on_progress(progress)

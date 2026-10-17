@@ -184,6 +184,102 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
             self.assertEqual(report.track_reports[0].status, "failed")
             self.assertEqual(report.track_reports[1].status, "failed")
 
+    def test_execute_rip_cumulative_error_telemetry(self):
+        from lazycdripper.core.models import RipProgress
+
+        class SimErrorRipper:
+            def rip_track(self, track_number, output_wav_path, device=None, total_tracks=2, on_progress=None):
+                if track_number == 1:
+                    # Simulate Track 1 having 5 retries and 3 errors
+                    p = RipProgress(
+                        current_track=1,
+                        total_tracks=2,
+                        track_percent=50.0,
+                        read_retries=5,
+                        unrecoverable_errors=3,
+                        status_message="Reading...",
+                    )
+                    if on_progress:
+                        on_progress(p)
+                    # Write dummy WAV so pipeline continues
+                    output_wav_path.write_bytes(b"RIFF" + b"\x00" * 100)
+                    return True
+                else:
+                    # Track 2 has 2 retries and 0 errors
+                    p = RipProgress(
+                        current_track=2,
+                        total_tracks=2,
+                        track_percent=100.0,
+                        read_retries=2,
+                        unrecoverable_errors=0,
+                        status_message="Reading...",
+                    )
+                    if on_progress:
+                        on_progress(p)
+                    output_wav_path.write_bytes(b"RIFF" + b"\x00" * 100)
+                    return True
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base_output = Path(temp_dir) / "Music"
+            album = AlbumInfo(
+                title="The Dark Side of the Moon",
+                artist="Pink Floyd",
+                album_artist="Pink Floyd",
+                year=1973,
+                total_tracks=2,
+                tracks=[
+                    TrackInfo(track_number=1, title="Speak to Me", artist="Pink Floyd"),
+                    TrackInfo(track_number=2, title="Breathe", artist="Pink Floyd"),
+                ],
+            )
+
+            orchestrator = RipPipelineOrchestrator(
+                ripper=SimErrorRipper(),
+                encoder=MockEncoder(),
+                tagger=AudioTagger(),
+            )
+
+            telemetry_events = []
+
+            def on_progress(p: RipProgress):
+                telemetry_events.append((p.current_track, p.read_retries, p.unrecoverable_errors, p.status_message))
+
+            report = orchestrator.execute_rip(
+                album=album,
+                base_output_dir=base_output,
+                on_progress=on_progress,
+            )
+
+            self.assertIsNotNone(report)
+            # Overall report totals
+            self.assertEqual(report.total_retries, 7)
+            self.assertEqual(report.total_errors, 3)
+            self.assertEqual(report.overall_status, "damaged")
+
+            # Track 1 individual report
+            self.assertEqual(report.track_reports[0].read_retries, 5)
+            self.assertEqual(report.track_reports[0].unrecoverable_errors, 3)
+            self.assertEqual(report.track_reports[0].status, "damaged")
+
+            # Track 2 individual report
+            self.assertEqual(report.track_reports[1].read_retries, 2)
+            self.assertEqual(report.track_reports[1].unrecoverable_errors, 0)
+            self.assertEqual(report.track_reports[1].status, "recovered")
+
+            # Verify cumulative telemetry was delivered to UI during Track 2:
+            # During Track 2, unrecoverable_errors in telemetry should NEVER drop back to 0!
+            track2_events = [e for e in telemetry_events if e[0] == 2]
+            self.assertGreater(len(track2_events), 0)
+            for ev in track2_events:
+                track_num, retries, errors, msg = ev
+                self.assertGreaterEqual(errors, 3, f"Errors dropped to {errors} during Track 2 event: {msg}")
+                self.assertGreaterEqual(retries, 5, f"Retries dropped to {retries} during Track 2 event: {msg}")
+
+            # Final Track 2 event should have full cumulative counts (7 retries, 3 errors)
+            final_t2 = track2_events[-1]
+            self.assertEqual(final_t2[1], 7)
+            self.assertEqual(final_t2[2], 3)
+
 
 if __name__ == "__main__":
     unittest.main()

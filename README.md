@@ -12,8 +12,8 @@
 
 The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just press the button!
 - **Both Formats in One Pass:** Never choose between archival quality and mobile convenience. You always get both:
-  - **FLAC Lossless (Perfect CD Copy):** Bit-perfect original CD (16-bit / 44.1 kHz) master with Level 8 archival compression and MD5 stream verification.
-  - **AAC Lossy (Compressed but Still Great):** High-bitrate Fraunhofer FDK-AAC (256k VBR in `.m4a`), ready for phones and native Bluetooth headphone listening without cross-codec transcode artifacts.
+  - **FLAC Lossless (Perfect CD copy):** Bit-perfect original CD (16-bit / 44.1 kHz) master with Level 8 archival compression and MD5 stream verification.
+  - **AAC Lossy (Compressed but still great):** High-bitrate Fraunhofer FDK-AAC (256k VBR in `.m4a`), ready for phones and native Bluetooth headphone listening without cross-codec transcode artifacts.
 - **Automatic Metadata & High-Res Artwork:** MusicBrainz disc ID lookup + canonical front covers from the Cover Art Archive embedded in every track, plus a companion `cover.jpg` for media servers.
 - **Sensible Organization:** Clean, zero-padded filenames in dedicated folders (`Artist - Album (Year) [FLAC]/` and `[AAC]/`).
 

@@ -482,7 +482,7 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             "<tr>"
             "<td width='12' valign='top' style='color: #FF9E3B; font-size: 8px; padding-top: 2px;'>●</td>"
             "<td style='padding-bottom: 10px;'>"
-            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>FLAC LOSSLESS (Perfect CD Copy)</div>"
+            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>FLAC LOSSLESS (Perfect CD copy)</div>"
             "<div style='color: #8E8D96; font-size: 9px; margin-top: 3px; line-height: 1.35;'>"
             "Audio CD 16-bit / 44.1 kHz bit-perfect master.<br>"
             "Archival compression (Level 8) with MD5 stream verify."
@@ -492,7 +492,7 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             "<tr>"
             "<td width='12' valign='top' style='color: #FF9E3B; font-size: 8px; padding-top: 2px;'>●</td>"
             "<td>"
-            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>AAC LOSSY (Compressed but Still Great)</div>"
+            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>AAC LOSSY (Compressed but still great)</div>"
             "<div style='color: #8E8D96; font-size: 9px; margin-top: 3px; line-height: 1.35;'>"
             "Fraunhofer FDK-AAC (VBR Mode 5 / 256k in .m4a).<br>"
             "Native Bluetooth codec (avoids cross-codec transcode artifacts)."
@@ -862,8 +862,6 @@ class MainWindow(QMainWindow if HAVE_QT else object):
         self.ripping_page.set_album(self.current_album)
         self.backdrop.set_artwork_pixmap(self._get_current_artwork_pixmap())
         self.main_stack.setCurrentIndex(1)  # Switch to analog ripping screen
-        if HAVE_QT and not self.isMaximized():
-            self.resize(1020, 700)
 
         self.worker_thread = RipWorkerThread(
             orchestrator=self.orchestrator,
@@ -906,21 +904,15 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             report=report,
             on_done=self._on_rip_done_dismiss,
         )
-        if HAVE_QT and not self.isMaximized():
-            self.resize(1020, 700)
 
     def _on_rip_done_dismiss(self):
         self.backdrop.set_artwork_pixmap(None)
         self.main_stack.setCurrentIndex(0)  # Return to main deck
-        if HAVE_QT and not self.isMaximized():
-            self.resize(1020, 700)
 
     def _on_rip_error(self, err_msg: str):
         self._is_ripping = False
         self.backdrop.set_artwork_pixmap(None)
         self.main_stack.setCurrentIndex(0)
-        if HAVE_QT and not self.isMaximized():
-            self.resize(1020, 700)
         logger.error("Ripping error occurred: %s", err_msg)
 
     def _on_version_label_clicked(self, event=None):

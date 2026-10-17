@@ -58,12 +58,30 @@ The application operates on a single unified master console:
   - Master Rip Button lights up in rich vacuum tube amber (`Rip to FLAC + AAC`).
   - Clicking "Rip to FLAC + AAC" prompts the user for the destination directory on demand.
 
-### 2.2 Active Ripping (Analog Deck)
-* Switches to the Analog Ripping Deck during execution:
-  - Dual precision progress bars (`Track` and `Album`).
-  - Real-time telemetry indicators.
-  - Rotating nostalgic music memories ticker.
-* Upon completion, displays the Completion Audit Dialog and returns cleanly to the Master Console.
+### 2.2 Active Ripping & In-Screen Completion Deck
+The application transitions seamlessly in-place from the Master Console to the central Ripping View without opening detached modal dialogs:
+* **Active Extraction Deck:**
+  - Animated Hi-Fi optical transport disc (200×200) with spinning laser sled and spindle LED.
+  - Symmetrical vertical spacing: 8px from spec badge to transport, 8px from transport to headline status row.
+  - Centered phase indicator and track progress bar (`track_label` + `track_bar`, 6px fixed spacing).
+  - Centered album progress indicator and progress bar (`overall_label` + `overall_bar`, 10px inter-bar spacing).
+  - Dual real-time hardware telemetry pills: `🟢 Retries: 0` and `🟢 Errors: 0`, updating cumulatively across the entire album in real time.
+  - Nostalgic audio memory ticker card: 72px fixed height card rotating wholesome physical CD and music memories every 90 seconds.
+  - **Layout Clamping (214px Fixed Height):** The entire active progress container is clamped to 214px with fixed spacing so that elements never stretch or drift apart when the window is enlarged or maximized.
+* **In-Screen Completion Summary (Replaces Active Container on Done):**
+  - Smoothly transitions in-place: stops disc animation and reveals the high-fidelity 3D metallic rock sloth mascot medallion (200×200).
+  - **Audited Mood Medallions:**
+    - *Happy Sloth (Thumbs Up):* Pristine bit-perfect rips and multi-pass recovered discs.
+    - *Sad Sloth (Thumbs Down):* Discs with unrecoverable surface damage or read failures.
+  - Centered clean headline with anti-aliased status LED (Green `#10B981`, Amber `#F59E0B`, Crimson `#EF4444`).
+  - Centered multi-line summary breakdown bullets (`human_readable_summary`).
+  - Output Sister Directories Card: Centered card displaying clean human-readable output folder paths:
+    - `📁  Artist - Album (Year) [FLAC] - Perfect CD copy (X.X MB)`
+    - `📁  Artist - Album (Year) [AAC] - Compressed but still great (Y.Y MB)`
+  - Centered action buttons: `Open Rip Folder` and `Done` (returns to Master Console).
+
+### 2.3 Style & Layout Design System Reference
+For the complete technical layout tokens, vertical alignment rules, anti-drift spacing matrices, and window geometry constraints, see [STYLE_GUIDE.md](file:///home/nduhovnijs/projects/lazycdripper/STYLE_GUIDE.md).
 
 ---
 
@@ -81,18 +99,24 @@ MainWindow
     │   │   ├── PrimaryRipButton ("Rip to FLAC + AAC")
     │   │   └── PolicyContainer
     │   │       ├── EngineeringPolicyNote ("Dual rip: [FLAC Master] + [AAC Mobile @ 256k]")
-    │   │       └── ChassisVersionLabel ("v0.9.2 • Peace... Like a River • Credits" clickable laser-etched serial plate opening CreditsDialog)
+    │   │       └── ChassisVersionLabel ("v0.9.2 • Peace... Like a River • Credits" clickable serial plate)
     │   └── RightDeck (Master Recording Roster)
     │       ├── MetadataHeaderCard (Unified status: No Drive -> Insert audio CD -> Fetching Metadata -> Album Title)
     │       └── TrackTableWidget (4 Columns: #, Title, Artist, Time; borderless rows, full height)
-    └── RippingViewWidget (Analog optical transport / dual progress meters)
+    └── RippingViewWidget (Analog optical transport / dual progress meters / in-screen completion deck)
+        ├── VisualFrame (Spec badge, 200x200 optical disc / sloth medallion, status headline, LED, subtitle)
+        ├── ActiveContainer (Clamped 214px: dual progress meters, telemetry pills, memories card)
+        └── CompletionContainer (Clamped output sister directories card, action buttons)
 ```
 
 ---
 
 ## 4. Completed Design Highlights & Polish
-* **Metadata & Artwork Provenance / Source Transparency (Completed):**
-  - Provenance badge seamlessly displays source origins (`Metadata: MusicBrainz • Artwork: Cover Art Archive`).
-  - Heuristic priority ranking automatically selects the canonical Release Group front cover without user configuration.
-* **Machined Anodized Platter:** High-DPI supersampled raster/vector disc with laser spiral tracks, amber LED spindle, and Red Book engraved branding.
+* **Central-Axis Symmetrical Alignment:** All elements on the active and completion decks align to `Qt.AlignCenter` along a unified vertical axis.
+* **Anti-Drift Sizing Clamping:** Elements stick together with fixed spacing when the window is enlarged or maximized.
+* **Window Size Preservation:** Window dimensions are strictly preserved across all page transitions (never resets to 1020×700 on navigation).
+* **Metadata & Artwork Provenance / Source Transparency:** Provenance badge displays source origins (`Metadata: MusicBrainz • Artwork: Cover Art Archive`). Canonical front covers selected via Release Group heuristic ranking.
+* **Tactile Mascot Medallions:** Cast pewter and dark gunmetal 3D rock sloth mascot medallions (Happy thumbs-up and Sad thumbs-down) framed in a machined knurled bezel with 0.96 scale factor to prevent edge clipping.
+* **Human-Readable Quality Terminology:** FLAC labeled as `Perfect CD copy` and AAC labeled as `Compressed but still great`, keeping technical parameters available for audiophiles who care.
+
 

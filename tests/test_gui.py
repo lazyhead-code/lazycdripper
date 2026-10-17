@@ -467,8 +467,8 @@ class TestTrackTableWidget(unittest.TestCase):
             self.assertIn("Mode 5", text)
             self.assertIn("Level 8", text)
             self.assertIn("FDK-AAC", text)
-            self.assertIn("Perfect CD Copy", text)
-            self.assertIn("Compressed but Still Great", text)
+            self.assertIn("Perfect CD copy", text)
+            self.assertIn("Compressed but still great", text)
             self.assertIn("bit-perfect", text)
 
             # Window default geometry tests
@@ -950,8 +950,14 @@ class TestTrackTableWidget(unittest.TestCase):
         self.assertTrue(view.status_led.isVisible())
         self.assertFalse(hasattr(view, "defect_card"))
         self.assertTrue(view.output_card.isVisible())
-        self.assertIn("Artist - Album [FLAC] - Lossless Archive", view.flac_dir_label.text())
+        self.assertIn("Artist - Album [FLAC] - Perfect CD copy", view.flac_dir_label.text())
+        self.assertIn("Artist - Album [AAC] - Compressed but still great", view.aac_dir_label.text())
         self.assertIn("50.0 MB", view.flac_dir_label.text())
+        self.assertEqual(view.track_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.overall_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
         # Sloth completion mascot is displayed in place of transport disc
         self.assertTrue(view.sloth_emblem.isVisible())
         self.assertFalse(view.transport_widget.isVisible())
@@ -1102,6 +1108,92 @@ class TestTrackTableWidget(unittest.TestCase):
         self.assertEqual(comp_dlg.sizeHint().height(), 480)
         self.assertEqual(comp_dlg.minimumSizeHint().width(), 540)
         self.assertEqual(comp_dlg.minimumSizeHint().height(), 480)
+
+    def test_ripping_view_layout_clamping_and_alignment(self):
+        """Verify that progress bars and labels have fixed heights and stay tightly clamped on resize."""
+        from lazycdripper.gui.widgets.ripping_view import RippingViewWidget, HAVE_QT
+        if not HAVE_QT:
+            self.skipTest("PySide6 not available in this environment")
+
+        from PySide6.QtCore import Qt
+        from PySide6.QtWidgets import QApplication, QSizePolicy
+        from lazycdripper.core.models import AlbumRipReport
+
+        app = QApplication.instance() or QApplication(["-platform", "offscreen"])
+        view = RippingViewWidget()
+
+        # 1. Active container height clamping
+        self.assertEqual(view.active_container.maximumHeight(), 214)
+        self.assertEqual(view.track_label.maximumHeight(), 18)
+        self.assertEqual(view.track_bar.maximumHeight(), 16)
+        self.assertEqual(view.overall_label.maximumHeight(), 18)
+        self.assertEqual(view.overall_bar.maximumHeight(), 16)
+        self.assertEqual(view.badge_retries.maximumHeight(), 24)
+        self.assertEqual(view.badge_errors.maximumHeight(), 24)
+        self.assertEqual(view.memory_card.maximumHeight(), 72)
+
+        # 2. Alignment checks on active view
+        self.assertEqual(view.track_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.overall_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.memory_label.alignment(), Qt.AlignCenter)
+
+        # 3. Size policies
+        self.assertEqual(view.active_container.sizePolicy().verticalPolicy(), QSizePolicy.Fixed)
+        self.assertEqual(view.visual_frame.sizePolicy().verticalPolicy(), QSizePolicy.Fixed)
+        self.assertEqual(view.completion_container.sizePolicy().verticalPolicy(), QSizePolicy.Fixed)
+
+        # 4. Alignment checks on completion view (both success and failure)
+        rep = AlbumRipReport(album_title="Test", artist="Artist", total_tracks=1, overall_status="pristine")
+        view.show_completion(rep)
+        self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignCenter)
+
+    def test_window_custom_size_preserved_across_transitions(self):
+        """Verify that user-resized window dimensions are preserved when switching screens."""
+        from lazycdripper.gui.main_window import MainWindow, HAVE_QT
+        if not HAVE_QT:
+            self.skipTest("PySide6 not available in this environment")
+
+        from PySide6.QtWidgets import QApplication
+        from lazycdripper.core.models import AlbumRipReport, AlbumInfo, TrackInfo
+
+        app = QApplication.instance() or QApplication(["-platform", "offscreen"])
+        window = MainWindow()
+
+        # User resizes window to larger custom dimensions
+        window.resize(1350, 880)
+        self.assertEqual(window.width(), 1350)
+        self.assertEqual(window.height(), 880)
+
+        # Simulate clicking rip / transitioning to ripping screen
+        window.current_album = AlbumInfo(
+            title="Test Album",
+            artist="Test Artist",
+            album_artist="Test Artist",
+            total_tracks=1,
+            tracks=[TrackInfo(track_number=1, title="T1", artist="Test Artist")],
+        )
+        window.main_stack.setCurrentIndex(1)
+        self.assertEqual(window.width(), 1350)
+        self.assertEqual(window.height(), 880)
+
+        # Transition to completion screen
+        rep = AlbumRipReport(album_title="Test Album", artist="Test Artist", total_tracks=1, overall_status="pristine")
+        window._on_rip_completed(rep)
+        self.assertEqual(window.width(), 1350)
+        self.assertEqual(window.height(), 880)
+
+        # Dismiss back to main screen
+        window._on_rip_done_dismiss()
+        self.assertEqual(window.width(), 1350)
+        self.assertEqual(window.height(), 880)
+
+        # Error dismissal back to main screen
+        window.main_stack.setCurrentIndex(1)
+        window._on_rip_error("Simulated error")
+        self.assertEqual(window.width(), 1350)
+        self.assertEqual(window.height(), 880)
 
 
 if __name__ == "__main__":
