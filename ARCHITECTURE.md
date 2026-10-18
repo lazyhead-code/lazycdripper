@@ -60,18 +60,18 @@ Lazy CD Ripper follows a **Decoupled Engine-Presenter Architecture**. The core a
 
 ### 2.4 `lazycdripper.encoder` (Transcoding Engine)
 * **Final Implementation:**
-  * Transcodes scratch WAV buffers into FLAC and MP3 using dedicated standalone CLI encoders.
+  * Transcodes scratch WAV buffers into FLAC and MP3 using dedicated standalone CLI encoders (`flac.exe` and `lame.exe`).
   * **Encoding Parameters:**
-    * **FLAC:** `flac.exe -8 --verify "<input.wav>" -o "<output.flac>"` (or `-compression_level 8 -verify` via fallback) — Lossless bit-perfect master archive.
-    * **MP3:** `lame.exe -b 320 -q 0 "<input.wav>" "<output.mp3>"` (or `-b:a 320k -q:a 0` via fallback) — Constant Bitrate (CBR) 320 kbps with maximum psychoacoustic quality model (`-q 0`).
+    * **FLAC:** `flac.exe -8 --verify "<input.wav>" -o "<output.flac>"` — Lossless bit-perfect master archive with stream integrity verification.
+    * **MP3:** `lame.exe -b 320 -q 0 "<input.wav>" "<output.mp3>"` — Constant Bitrate (CBR) 320 kbps with maximum psychoacoustic quality model (`-q 0`).
   * **Zero Console Window Execution (`CREATE_NO_WINDOW`):**
     * All encoder subprocesses on Windows are invoked with `creationflags=subprocess.CREATE_NO_WINDOW` (`0x08000000`). This completely eliminates console window flicker / black boxes, running encoders silently and invisibly in the background.
   * **Option A: Official Dedicated Standalone Binaries:**
     * Bundles official, lightweight, open-source binaries: Xiph.org `flac.exe` (~1.5 MB, BSD) and RareWares/LAME `lame.exe` (~800 KB, LGPL).
-    * Total bundled binary footprint is **under 2.5 MB** (compared to ~80 MB for full FFmpeg).
+    * Total bundled binary footprint is **under 2.5 MB** (drastically reducing application package size).
     * Zero AAC or video codec code exists in either binary, guaranteeing 100% patent-free legal distribution.
 * **Motivation:**
-  * Dedicated standalone encoders (`flac.exe` and `lame.exe`) are the gold standard of the audiophile community (used by Exact Audio Copy and CUERipper). They drastically shrink the distributable archive size, completely insulate the project from AAC patent claims, and run with zero console flashing via `CREATE_NO_WINDOW`.
+  * Dedicated standalone encoders (`flac.exe` and `lame.exe`) are the gold standard of the audiophile community (used by Exact Audio Copy and CUERipper). They drastically shrink the distributable archive size, completely insulate the project from patent claims, and run with zero console flashing via `CREATE_NO_WINDOW`.
 
 ### 2.5 `lazycdripper.tagger` (Metadata & Artwork Embedding)
 * **Final Implementation:**

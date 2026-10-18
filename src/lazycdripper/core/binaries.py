@@ -1,11 +1,14 @@
-"""Cross-platform discovery and resolution for external bundled binaries (cdparanoia, ffmpeg)."""
+"""Cross-platform discovery and resolution for external bundled binaries (cdparanoia, flac, lame)."""
 
+import io
 import logging
 import os
 from pathlib import Path
 import shutil
 import sys
 from typing import Callable, List, Optional
+import urllib.request
+import zipfile
 
 logger = logging.getLogger(__name__)
 
@@ -109,26 +112,20 @@ def is_binary_available(name_or_path: str) -> bool:
     return shutil.which(name_or_path) is not None
 
 
-def ensure_ffmpeg(progress_callback: Optional[Callable[[int, int], None]] = None) -> Optional[str]:
+def ensure_encoders(progress_callback: Optional[Callable[[int, int], None]] = None) -> bool:
     """
-    Ensure a working FFmpeg binary is available on the system.
-    If already available in PATH or search directories, returns its path.
-    Otherwise, downloads a standalone static binary from official distribution wheels
-    into the application or user cache directory.
+    Ensure working standalone FLAC and LAME binaries are available on the system.
+    If already available in PATH or search directories, returns True.
+    Otherwise, downloads official standalone static binaries for Windows (flac.exe, lame.exe, lame_enc.dll)
+    into the application bin or user local AppData directory.
 
-    Returns the absolute path to the executable, or None if unavailable.
+    Returns True if both encoders are ready, False otherwise.
     """
-    found = find_binary("ffmpeg")
-    if is_binary_available(found):
-        return found
+    flac_found = find_binary("flac")
+    lame_found = find_binary("lame")
 
-    import io
-    import urllib.request
-    import zipfile
-
-    # Official imageio-ffmpeg wheel distribution URL for Windows 64-bit (clean standalone static build)
-    url = "https://files.pythonhosted.org/packages/2c/c6/fa760e12a2483469e2bf5058c5faff664acf66cadb4df2ad6205b016a73d/imageio_ffmpeg-0.6.0-py3-none-win_amd64.whl"
-    target_name = "ffmpeg.exe"
+    if is_binary_available(flac_found) and is_binary_available(lame_found):
+        return True
 
     # Destination directories: preferred repo bin/, fallback user cache
     dest_dir = None
@@ -151,42 +148,65 @@ def ensure_ffmpeg(progress_callback: Optional[Callable[[int, int], None]] = None
             user_bin.mkdir(parents=True, exist_ok=True)
             dest_dir = user_bin
         except Exception as err:
-            logger.error("Could not create destination directory for FFmpeg: %s", err)
-            return None
+            logger.error("Could not create destination directory for encoders: %s", err)
+            return False
 
-    target_path = dest_dir / target_name
+    # Download FLAC if missing
+    if not is_binary_available(find_binary("flac")):
+        flac_url = "https://github.com/xiph/flac/releases/download/1.4.3/flac-1.4.3-win.zip"
+        logger.info("Downloading standalone FLAC binary from %s...", flac_url)
+        try:
+            req = urllib.request.Request(flac_url, headers={"User-Agent": "LazyCDRipper/1.0"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                flac_zip_data = resp.read()
+            with zipfile.ZipFile(io.BytesIO(flac_zip_data)) as z:
+                flac_entry = None
+                for name in z.namelist():
+                    if name.endswith("flac.exe") and "win64" in name.lower():
+                        flac_entry = name
+                        break
+                if not flac_entry:
+                    for name in z.namelist():
+                        if name.endswith("flac.exe"):
+                            flac_entry = name
+                            break
+                if flac_entry:
+                    target_flac = dest_dir / "flac.exe"
+                    target_flac.write_bytes(z.read(flac_entry))
+                    logger.info("Installed standalone FLAC to %s", target_flac)
+                else:
+                    logger.error("flac.exe not found inside downloaded FLAC zip")
+        except Exception as err:
+            logger.error("Failed to download FLAC binary: %s", err)
 
-    logger.info("Downloading standalone FFmpeg binary for Windows to %s...", target_path)
-    try:
-        with urllib.request.urlopen(url, timeout=60) as resp:
-            total_size = int(resp.headers.get("content-length", 0))
-            data = bytearray()
-            chunk_size = 65536
-            while True:
-                chunk = resp.read(chunk_size)
-                if not chunk:
-                    break
-                data.extend(chunk)
-                if progress_callback and total_size > 0:
-                    progress_callback(len(data), total_size)
+    # Download LAME if missing
+    if not is_binary_available(find_binary("lame")):
+        lame_url = "https://www.rarewares.org/files/mp3/lame-3.101.b3-q4patched-x64.zip"
+        logger.info("Downloading standalone LAME binary from %s...", lame_url)
+        try:
+            req = urllib.request.Request(lame_url, headers={"User-Agent": "LazyCDRipper/1.0"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                lame_zip_data = resp.read()
+            with zipfile.ZipFile(io.BytesIO(lame_zip_data)) as z:
+                for entry in z.namelist():
+                    lower = entry.lower()
+                    if lower.endswith("lame.exe"):
+                        target_lame = dest_dir / "lame.exe"
+                        target_lame.write_bytes(z.read(entry))
+                        logger.info("Installed standalone LAME to %s", target_lame)
+                    elif lower.endswith("lame_enc.dll"):
+                        target_dll = dest_dir / "lame_enc.dll"
+                        target_dll.write_bytes(z.read(entry))
+                        logger.info("Installed standalone LAME DLL to %s", target_dll)
+        except Exception as err:
+            logger.error("Failed to download LAME binary: %s", err)
 
-        with zipfile.ZipFile(io.BytesIO(data)) as z:
-            for entry in z.namelist():
-                if entry.endswith(".exe"):
-                    target_path.write_bytes(z.read(entry))
-                    logger.info("Successfully installed standalone FFmpeg to %s", target_path)
-                    return str(target_path.resolve())
-
-        logger.error("FFmpeg binary not found inside downloaded wheel package")
-        return None
-    except Exception as err:
-        logger.error("Failed to download/install FFmpeg binary: %s", err)
-        return None
+    return is_binary_available(find_binary("flac")) and is_binary_available(find_binary("lame"))
 
 
 __all__ = [
     "find_binary",
     "is_binary_available",
-    "ensure_ffmpeg",
+    "ensure_encoders",
     "get_binary_search_paths",
 ]

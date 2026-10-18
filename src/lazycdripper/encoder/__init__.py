@@ -1,9 +1,8 @@
-"""Audio encoding subsystem handling FLAC and MP3 transcoding via standalone FLAC/LAME binaries or FFmpeg fallback."""
+"""Audio encoding subsystem handling FLAC and MP3 transcoding via standalone FLAC and LAME binaries."""
 
-from lazycdripper.encoder.ffmpeg import AudioEncoder, FFmpegEncoder, MockEncoder
+from lazycdripper.encoder.encoder import AudioEncoder, MockEncoder
 
 __all__ = [
     "AudioEncoder",
-    "FFmpegEncoder",
     "MockEncoder",
 ]

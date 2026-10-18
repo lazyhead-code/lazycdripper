@@ -9,7 +9,7 @@ from lazycdripper.core.models import (
     TrackInfo,
     TrackRipReport,
 )
-from lazycdripper.core.binaries import ensure_ffmpeg, find_binary, is_binary_available
+from lazycdripper.core.binaries import ensure_encoders, find_binary, is_binary_available
 from lazycdripper.core.sanitizer import (
     format_album_directory_name,
     format_track_filename,
@@ -26,7 +26,7 @@ __all__ = [
     "RipProgress",
     "TrackInfo",
     "TrackRipReport",
-    "ensure_ffmpeg",
+    "ensure_encoders",
     "find_binary",
     "format_album_directory_name",
     "format_track_filename",

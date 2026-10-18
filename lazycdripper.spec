@@ -47,7 +47,7 @@ hiddenimports = [
     "lazycdripper.disc.drive",
     "lazycdripper.disc.toc",
     "lazycdripper.encoder",
-    "lazycdripper.encoder.ffmpeg",
+    "lazycdripper.encoder.encoder",
     "lazycdripper.gui",
     "lazycdripper.gui.main",
     "lazycdripper.gui.main_window",

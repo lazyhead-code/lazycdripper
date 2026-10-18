@@ -16,7 +16,7 @@ from lazycdripper.core.sanitizer import (
     format_album_directory_name,
     get_target_track_path,
 )
-from lazycdripper.encoder.ffmpeg import FFmpegEncoder
+from lazycdripper.encoder import AudioEncoder
 from lazycdripper.ripper import get_default_ripper
 from lazycdripper.tagger.tagger import AudioTagger
 
@@ -38,15 +38,15 @@ class RipPipelineOrchestrator:
         if encoder is not None:
             self.encoder = encoder
         else:
-            ffmpeg_enc = FFmpegEncoder()
-            if not ffmpeg_enc.is_available:
+            audio_enc = AudioEncoder()
+            if not audio_enc.is_available:
                 try:
-                    from lazycdripper.core.binaries import ensure_ffmpeg
-                    ensure_ffmpeg()
-                    ffmpeg_enc = FFmpegEncoder()
+                    from lazycdripper.core.binaries import ensure_encoders
+                    ensure_encoders()
+                    audio_enc = AudioEncoder()
                 except Exception as err:
-                    logger.warning("Could not automatically prepare FFmpeg: %s", err)
-            self.encoder = ffmpeg_enc
+                    logger.warning("Could not automatically prepare audio encoders: %s", err)
+            self.encoder = audio_enc
         self.tagger = tagger or AudioTagger()
 
     def execute_rip(
@@ -64,8 +64,8 @@ class RipPipelineOrchestrator:
         """
         if not getattr(self.encoder, "is_available", False):
             raise RuntimeError(
-                "An audio encoder (FLAC/LAME or FFmpeg) is required to encode audio files to FLAC and MP3, but was not found. "
-                "Please ensure encoders are available."
+                "Audio encoders (FLAC and LAME) are required to encode audio files to FLAC and MP3, but were not found. "
+                "Please ensure flac and lame binaries are available."
             )
 
         start_time = time.time()
@@ -239,7 +239,7 @@ class RipPipelineOrchestrator:
                     flac_ok, mp3_ok = self.encoder.encode_dual(
                         input_wav=scratch_wav,
                         output_flac=flac_dest,
-                        output_lossy=mp3_dest,
+                        output_mp3=mp3_dest,
                     )
 
                     flac_valid = (

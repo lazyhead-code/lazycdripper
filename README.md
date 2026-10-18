@@ -52,7 +52,7 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 - **Telemetry Cleanup:** Removed obsolete 1990s "Jitter Align" telemetry badge in favor of clean, reassuring sector error and retry monitoring.
 - **Fidelity Terminology:** Simplified all "Red Book Audio" jargon to clear, everyday audiophile fidelity (`AUDIO CD • 16-BIT / 44.1 kHz`).
 - **Native In-Screen Completion:** Replaced the floating popup dialog with an elegant in-screen completion summary directly inside the ripping deck, displaying the bit-perfect verdict, defect diagnostics (if any), library folder paths with sizes, and single-click folder access.
-- **Windows Subprocess Unicode Fix:** Explicitly set UTF-8 stream encoding and fallback error replacement on all FFmpeg and drive subprocess readers, preventing Windows CP1252 charmap decode crashes on non-ASCII metadata.
+- **Windows Subprocess Unicode Fix:** Explicitly set UTF-8 stream encoding and fallback error replacement on all encoder and drive subprocess readers, preventing Windows CP1252 charmap decode crashes on non-ASCII metadata.
 
 ### v0.9.1 — *"Peace... Like a River (Update)"* (October 2026)
 - **Cover Art Gateway Resilience:** Added direct `/front` endpoint fallback and public high-res artwork resolution via Apple iTunes and Deezer when Internet Archive / Cover Art Archive experiences `502 Bad Gateway` outages.

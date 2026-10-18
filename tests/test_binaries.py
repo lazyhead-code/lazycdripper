@@ -70,21 +70,21 @@ class TestBinaries(unittest.TestCase):
 
     def test_find_binary_uses_system_path_when_not_bundled(self):
         with patch("lazycdripper.core.binaries.get_binary_search_paths", return_value=[]), \
-             patch("shutil.which", return_value="/usr/bin/ffmpeg"):
-            found = find_binary("ffmpeg")
-            self.assertEqual(found, "/usr/bin/ffmpeg")
+             patch("shutil.which", return_value="/usr/bin/flac"):
+            found = find_binary("flac")
+            self.assertEqual(found, "/usr/bin/flac")
 
     def test_find_binary_prefers_bundled_over_system_path(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             bundled_bin_dir = Path(tmp_dir) / "bin"
             bundled_bin_dir.mkdir()
-            bundled_tool = bundled_bin_dir / "ffmpeg"
+            bundled_tool = bundled_bin_dir / "lame"
             bundled_tool.write_text("#!/bin/sh\necho bundled")
             bundled_tool.chmod(0o755)
 
             with patch("lazycdripper.core.binaries.get_binary_search_paths", return_value=[bundled_bin_dir]), \
-                 patch("shutil.which", return_value="/usr/bin/ffmpeg"):
-                found = find_binary("ffmpeg")
+                 patch("shutil.which", return_value="/usr/bin/lame"):
+                found = find_binary("lame")
                 self.assertEqual(Path(found).resolve(), bundled_tool.resolve())
 
     def test_is_binary_available_real(self):
@@ -93,6 +93,11 @@ class TestBinaries(unittest.TestCase):
     def test_is_binary_available_false(self):
         with patch("shutil.which", return_value=None):
             self.assertFalse(is_binary_available("nonexistent_binary_9999"))
+
+    def test_ensure_encoders_already_available(self):
+        from lazycdripper.core.binaries import ensure_encoders
+        with patch("lazycdripper.core.binaries.is_binary_available", return_value=True):
+            self.assertTrue(ensure_encoders())
 
 
 if __name__ == "__main__":

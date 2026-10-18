@@ -39,19 +39,15 @@ def build_pyinstaller(project_root: Path):
     import shutil
     dist_dir = project_root / "dist" / APP_NAME
 
-    # Ensure bundled bin directory in dist contains ffmpeg.exe & license if present in repo
-    bin_src = project_root / "bin" / "ffmpeg.exe"
+    # Ensure bundled bin directory in dist contains standalone binaries (flac.exe, lame.exe, lame_enc.dll) if present in repo
+    bin_dir = project_root / "bin"
     dist_bin = dist_dir / "bin"
-    if bin_src.is_file():
-        dist_bin.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(bin_src, dist_bin / "ffmpeg.exe")
-        print(f"Copied bundled FFmpeg to {dist_bin / 'ffmpeg.exe'}")
-
-    bin_lic = project_root / "bin" / "ffmpeg-license.txt"
-    if bin_lic.is_file():
-        dist_bin.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(bin_lic, dist_bin / "ffmpeg-license.txt")
-        print(f"Copied FFmpeg license to {dist_bin / 'ffmpeg-license.txt'}")
+    if bin_dir.is_dir():
+        for b_file in bin_dir.iterdir():
+            if b_file.is_file():
+                dist_bin.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(b_file, dist_bin / b_file.name)
+                print(f"Copied bundled binary {b_file.name} to {dist_bin / b_file.name}")
 
     # Copy legal documentation (GPLv3 & Third-Party Attributions)
     for lic_file in ["LICENSE", "THIRD_PARTY_LICENSES.md"]:

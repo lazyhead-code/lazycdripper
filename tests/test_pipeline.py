@@ -8,7 +8,7 @@ from lazycdripper.core.models import (
     ArtworkCandidate,
     TrackInfo,
 )
-from lazycdripper.encoder.ffmpeg import MockEncoder
+from lazycdripper.encoder import MockEncoder
 from lazycdripper.pipeline.orchestrator import RipPipelineOrchestrator
 from lazycdripper.ripper.mock import MockRipper
 from lazycdripper.tagger.tagger import AudioTagger

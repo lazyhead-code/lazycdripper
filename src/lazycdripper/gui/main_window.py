@@ -337,8 +337,8 @@ class MainWindow(QMainWindow if HAVE_QT else object):
         # Ensure audio encoder is available in background if not already found
         if not getattr(self.orchestrator.encoder, "is_available", False):
             import threading
-            from lazycdripper.core.binaries import ensure_ffmpeg
-            threading.Thread(target=ensure_ffmpeg, daemon=True).start()
+            from lazycdripper.core.binaries import ensure_encoders
+            threading.Thread(target=ensure_encoders, daemon=True).start()
 
         self.current_album: Optional[AlbumInfo] = None
         self.current_drives: List[DriveInfo] = []
@@ -834,13 +834,13 @@ class MainWindow(QMainWindow if HAVE_QT else object):
 
         # Pre-flight check: ensure audio encoder is available
         if not getattr(self.orchestrator.encoder, "is_available", False):
-            from lazycdripper.core.binaries import ensure_ffmpeg
-            ensure_ffmpeg()
+            from lazycdripper.core.binaries import ensure_encoders
+            ensure_encoders()
             if not getattr(self.orchestrator.encoder, "is_available", False):
                 QMessageBox.critical(
                     self,
-                    "Audio Encoder Required",
-                    "An audio encoder (FLAC/LAME or FFmpeg) is required to encode audio into FLAC and MP3, but could not be located.\n\n"
+                    "Audio Encoders Required",
+                    "FLAC and LAME audio encoders are required to transcode audio into FLAC and MP3, but could not be located.\n\n"
                     "Please ensure encoders are available or internet access is enabled for automated setup.",
                 )
                 return

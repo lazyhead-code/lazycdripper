@@ -37,15 +37,22 @@ jobs:
           python -m pip install pyinstaller
           python -m pip install .
 
-      - name: Download bundled FFmpeg for Windows
+      - name: Download bundled FLAC & LAME for Windows
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path bin
-          curl.exe -L -o ffmpeg.zip "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
-          Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_extracted -Force
-          Get-ChildItem -Path ffmpeg_extracted -Filter "ffmpeg.exe" -Recurse | Move-Item -Destination bin/ffmpeg.exe -Force
-          Get-ChildItem -Path ffmpeg_extracted -Filter "LICENSE*" -Recurse | Select-Object -First 1 | Copy-Item -Destination bin/ffmpeg-license.txt -Force
-          Remove-Item -Recurse -Force ffmpeg.zip, ffmpeg_extracted
+          # Download FLAC Win64 from Xiph.org
+          curl.exe -L -o flac.zip "https://github.com/xiph/flac/releases/download/1.4.3/flac-1.4.3-win.zip"
+          Expand-Archive -Path flac.zip -DestinationPath flac_extracted -Force
+          Get-ChildItem -Path flac_extracted -Filter "flac.exe" -Recurse | Where-Object { $_.FullName -like "*Win64*" } | Select-Object -First 1 | Move-Item -Destination bin/flac.exe -Force
+          Remove-Item -Recurse -Force flac.zip, flac_extracted
+
+          # Download LAME x64 from RareWares
+          curl.exe -L -o lame.zip "https://www.rarewares.org/files/mp3/lame-3.101.b3-q4patched-x64.zip"
+          Expand-Archive -Path lame.zip -DestinationPath lame_extracted -Force
+          Get-ChildItem -Path lame_extracted -Filter "lame.exe" -Recurse | Select-Object -First 1 | Move-Item -Destination bin/lame.exe -Force
+          Get-ChildItem -Path lame_extracted -Filter "lame_enc.dll" -Recurse | Select-Object -First 1 | Move-Item -Destination bin/lame_enc.dll -Force
+          Remove-Item -Recurse -Force lame.zip, lame_extracted
 
       - name: Build Standalone Package with PyInstaller
         run: |
@@ -55,11 +62,8 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist/LazyCDRipper/bin
-          if (Test-Path bin/ffmpeg.exe) {
-            Copy-Item bin/ffmpeg.exe dist/LazyCDRipper/bin/ffmpeg.exe -Force
-          }
-          if (Test-Path bin/ffmpeg-license.txt) {
-            Copy-Item bin/ffmpeg-license.txt dist/LazyCDRipper/bin/ffmpeg-license.txt -Force
+          if (Test-Path bin) {
+            Copy-Item bin/* dist/LazyCDRipper/bin/ -Force -Recurse
           }
           Copy-Item LICENSE dist/LazyCDRipper/LICENSE -Force
           Copy-Item THIRD_PARTY_LICENSES.md dist/LazyCDRipper/THIRD_PARTY_LICENSES.md -Force
