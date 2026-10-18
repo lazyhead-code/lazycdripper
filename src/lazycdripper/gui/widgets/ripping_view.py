@@ -413,9 +413,9 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             self.visual_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.visual_frame.setStyleSheet(
             "QFrame#rippingBanner { "
-            "  background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 rgba(28, 24, 20, 0.72), stop:1 rgba(16, 16, 22, 0.76)); "
-            "  border: 1.5px solid rgba(255, 158, 59, 0.50); "
-            "  border-radius: 16px; "
+            "  background-color: #14141A; "
+            "  border: 1px solid #2C2C36; "
+            "  border-radius: 12px; "
             "  padding: 24px; "
             "}"
         )

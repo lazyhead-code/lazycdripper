@@ -265,23 +265,24 @@ QProgressBar::chunk {{
     border-radius: 5px;
 }}
 
-/* Ergonomic Floating Pill Scrollbars (Comfortable, fat target, insetting past curved corners) */
+/* Ergonomic Floating Pill Scrollbars (Comfortable, fat target, rounded capsule track and handle) */
 QScrollBar:vertical {{
-    background: transparent;
-    width: 16px;
+    background-color: #181820;
+    width: 14px;
     margin: 10px 2px 10px 2px;
-    border: none;
+    border: 1px solid transparent;
+    border-radius: 7px;
 }}
 
 QScrollBar:vertical:hover {{
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    background-color: #242330;
 }}
 
 QScrollBar::handle:vertical {{
     background-color: #424154;
     min-height: 38px;
-    border-radius: 6px;
+    border-radius: 5px;
+    margin: 1px;
 }}
 
 QScrollBar::handle:vertical:hover {{
@@ -305,21 +306,22 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
 }}
 
 QScrollBar:horizontal {{
-    background: transparent;
-    height: 16px;
+    background-color: #181820;
+    height: 14px;
     margin: 2px 10px 2px 10px;
-    border: none;
+    border: 1px solid transparent;
+    border-radius: 7px;
 }}
 
 QScrollBar:horizontal:hover {{
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
+    background-color: #242330;
 }}
 
 QScrollBar::handle:horizontal {{
     background-color: #424154;
     min-width: 38px;
-    border-radius: 6px;
+    border-radius: 5px;
+    margin: 1px;
 }}
 
 QScrollBar::handle:horizontal:hover {{
