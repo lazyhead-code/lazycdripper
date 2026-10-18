@@ -616,15 +616,15 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         )
         out_layout = QVBoxLayout(self.output_card)
         out_layout.setSpacing(10)
-        out_layout.setAlignment(Qt.AlignCenter)
+        out_layout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.flac_dir_label = QLabel("📁 [FLAC] - Perfect CD copy")
         self.flac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
-        self.flac_dir_label.setAlignment(Qt.AlignCenter)
-        out_layout.addWidget(self.flac_dir_label, alignment=Qt.AlignCenter)
+        self.flac_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        out_layout.addWidget(self.flac_dir_label, alignment=Qt.AlignLeft)
         self.mp3_dir_label = QLabel("📁 [MP3] - Compressed but still great")
         self.mp3_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
-        self.mp3_dir_label.setAlignment(Qt.AlignCenter)
-        out_layout.addWidget(self.mp3_dir_label, alignment=Qt.AlignCenter)
+        self.mp3_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        out_layout.addWidget(self.mp3_dir_label, alignment=Qt.AlignLeft)
         self.aac_dir_label = self.mp3_dir_label  # Backward-compatible attribute alias
         comp_box.addWidget(self.output_card, alignment=Qt.AlignCenter)
 
@@ -697,8 +697,8 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             mp3_title = mp3_dir.name if mp3_dir else "[MP3]"
             self.flac_dir_label.setText(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
             self.mp3_dir_label.setText(f"📁  {mp3_title} - Compressed but still great ({mp3_mb:.1f} MB)")
-            self.flac_dir_label.setAlignment(Qt.AlignCenter)
-            self.mp3_dir_label.setAlignment(Qt.AlignCenter)
+            self.flac_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            self.mp3_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.output_card.setVisible(True)
             self.btn_open_rip.setVisible(bool(report.rip_folder))
         else:

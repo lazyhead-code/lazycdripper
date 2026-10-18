@@ -958,9 +958,9 @@ class TestTrackTableWidget(unittest.TestCase):
         self.assertIn("50.0 MB", view.flac_dir_label.text())
         self.assertEqual(view.track_label.alignment(), Qt.AlignCenter)
         self.assertEqual(view.overall_label.alignment(), Qt.AlignCenter)
-        self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignCenter)
-        self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignCenter)
-        self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
+        self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
+        self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
         # Sloth completion mascot is displayed in place of transport disc
         self.assertTrue(view.sloth_emblem.isVisible())
@@ -1150,9 +1150,9 @@ class TestTrackTableWidget(unittest.TestCase):
         rep = AlbumRipReport(album_title="Test", artist="Artist", total_tracks=1, overall_status="pristine")
         view.show_completion(rep)
         self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
-        self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignCenter)
-        self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignCenter)
-        self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
+        self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
+        self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
 
     def test_window_custom_size_preserved_across_transitions(self):
         """Verify that user-resized window dimensions are preserved when switching screens."""
