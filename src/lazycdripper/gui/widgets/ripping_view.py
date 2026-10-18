@@ -407,8 +407,8 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         # Central Visual Emblem / Animated Optical Transport Banner
         self.visual_frame = QFrame()
         self.visual_frame.setObjectName("rippingBanner")
-        self.visual_frame.setMinimumWidth(640)
-        self.visual_frame.setMaximumWidth(760)
+        self.visual_frame.setMinimumWidth(860)
+        self.visual_frame.setMaximumWidth(960)
         if HAVE_QT:
             self.visual_frame.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.visual_frame.setStyleSheet(
@@ -499,8 +499,8 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         # Active Progress Container (visible during active ripping)
         self.active_container = QWidget()
-        self.active_container.setMinimumWidth(640)
-        self.active_container.setMaximumWidth(760)
+        self.active_container.setMinimumWidth(860)
+        self.active_container.setMaximumWidth(960)
         if HAVE_QT:
             self.active_container.setFixedHeight(214)
             self.active_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
@@ -584,7 +584,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.memory_card.setFixedHeight(72)
         self.memory_card.setStyleSheet("QFrame#previewCard { background-color: #16161C; border: 1px solid #2C2C34; border-radius: 8px; }")
         mem_layout = QHBoxLayout(self.memory_card)
-        mem_layout.setContentsMargins(20, 6, 20, 6)
+        mem_layout.setContentsMargins(16, 6, 16, 6)
 
         initial_text = self._shuffled_memories[0] if self._shuffled_memories else ""
         self.memory_label = QLabel(initial_text)
@@ -600,8 +600,8 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         # Completion Container (replaces active container when rip finishes)
         self.completion_container = QWidget()
-        self.completion_container.setMinimumWidth(640)
-        self.completion_container.setMaximumWidth(760)
+        self.completion_container.setMinimumWidth(860)
+        self.completion_container.setMaximumWidth(960)
         if HAVE_QT:
             self.completion_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         comp_box = QVBoxLayout(self.completion_container)
