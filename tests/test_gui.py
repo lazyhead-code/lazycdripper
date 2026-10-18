@@ -1130,11 +1130,11 @@ class TestTrackTableWidget(unittest.TestCase):
         view = RippingViewWidget()
 
         # 1. Active container height clamping
-        self.assertEqual(view.active_container.maximumHeight(), 214)
+        self.assertEqual(view.active_container.maximumHeight(), 246)
         self.assertEqual(view.track_label.maximumHeight(), 18)
-        self.assertEqual(view.track_bar.maximumHeight(), 16)
+        self.assertEqual(view.track_bar.maximumHeight(), 20)
         self.assertEqual(view.overall_label.maximumHeight(), 18)
-        self.assertEqual(view.overall_bar.maximumHeight(), 16)
+        self.assertEqual(view.overall_bar.maximumHeight(), 20)
         self.assertEqual(view.badge_retries.maximumHeight(), 24)
         self.assertEqual(view.badge_errors.maximumHeight(), 24)
         self.assertEqual(view.memory_card.maximumHeight(), 72)

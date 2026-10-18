@@ -81,13 +81,13 @@ When the user enlarges or maximizes the application window, **UI elements must s
 ### 3.2 Sizing & Spacing Rhythm (Active Ripping Screen)
 | Element | Height | Spacing to Next Element | Policy / Behavior |
 | :--- | :--- | :--- | :--- |
-| **`track_label`** | 18px | 6px | Fixed height, `Qt.AlignCenter` |
-| **`track_bar`** | 16px | 10px | Fixed height |
-| **`overall_label`** | 18px | 6px | Fixed height, `Qt.AlignCenter` |
-| **`overall_bar`** | 16px | 14px | Fixed height |
-| **`telemetry_row`** | 24px | 14px | Fixed height badges (`Retries: N`, `Errors: N`) |
+| **`track_label`** | 18px | 8px | Fixed height, `Qt.AlignCenter` |
+| **`track_bar`** | 20px | 22px | Fixed height analog progress meter |
+| **`overall_label`** | 18px | 8px | Fixed height, `Qt.AlignCenter`, muted secondary |
+| **`overall_bar`** | 20px | 18px | Fixed height analog progress meter |
+| **`telemetry_row`** | 24px | 18px | Fixed height badges (`Retries: N`, `Errors: N`) |
 | **`memory_card`** | 72px | — | Fixed height preview card |
-| **`active_container`** | **214px** | — | **`setFixedHeight(214)`**, `QSizePolicy.Fixed` vertical |
+| **`active_container`** | **246px** | — | **`setFixedHeight(246)`**, `QSizePolicy.Fixed` vertical |
 | **`visual_frame`** | ~340px | 16px | `QSizePolicy.Fixed` vertical |
 | **`main_layout`** | — | 16px | `Qt.AlignCenter`, centered in window |
 

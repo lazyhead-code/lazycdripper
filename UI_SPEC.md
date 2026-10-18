@@ -63,11 +63,11 @@ The application transitions seamlessly in-place from the Master Console to the c
 * **Active Extraction Deck:**
   - Animated Hi-Fi optical transport disc (200×200) with spinning laser sled and spindle LED.
   - Symmetrical vertical spacing: 8px from spec badge to transport, 8px from transport to headline status row.
-  - Centered phase indicator and track progress bar (`track_label` + `track_bar`, 6px fixed spacing).
-  - Centered album progress indicator and progress bar (`overall_label` + `overall_bar`, 10px inter-bar spacing).
+  - Centered phase indicator and 20px track progress bar (`track_label` + `track_bar`, 8px fixed spacing).
+  - Centered album progress indicator and 20px progress bar (`overall_label` + `overall_bar`, 22px inter-meter separation).
   - Dual real-time hardware telemetry pills: `🟢 Retries: 0` and `🟢 Errors: 0`, updating cumulatively across the entire album in real time.
   - Nostalgic audio memory ticker card: 72px fixed height card rotating wholesome physical CD and music memories every 90 seconds.
-  - **Layout Clamping (214px Fixed Height):** The entire active progress container is clamped to 214px with fixed spacing so that elements never stretch or drift apart when the window is enlarged or maximized.
+  - **Layout Clamping (246px Fixed Height):** The entire active progress container is clamped to 246px with generous breathing room so that elements never stretch or drift apart when the window is enlarged or maximized.
 * **In-Screen Completion Summary (Replaces Active Container on Done):**
   - Smoothly transitions in-place: stops disc animation and reveals the high-fidelity 3D metallic rock sloth mascot medallion (200×200).
   - **Audited Mood Medallions:**
@@ -105,7 +105,7 @@ MainWindow
     │       └── TrackTableWidget (4 Columns: #, Title, Artist, Time; borderless rows, full height)
     └── RippingViewWidget (Analog optical transport / dual progress meters / in-screen completion deck)
         ├── VisualFrame (Spec badge, 200x200 optical disc / sloth medallion, status headline, LED, subtitle)
-        ├── ActiveContainer (Clamped 214px: dual progress meters, telemetry pills, memories card)
+        ├── ActiveContainer (Clamped 246px: dual progress meters, telemetry pills, memories card)
         └── CompletionContainer (Clamped output sister directories card, action buttons)
 ```
 

@@ -502,7 +502,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.active_container.setMinimumWidth(860)
         self.active_container.setMaximumWidth(960)
         if HAVE_QT:
-            self.active_container.setFixedHeight(214)
+            self.active_container.setFixedHeight(246)
             self.active_container.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         active_box = QVBoxLayout(self.active_container)
         active_box.setContentsMargins(0, 0, 0, 0)
@@ -522,39 +522,39 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         progress_box.addWidget(self.track_label)
 
         if HAVE_QT:
-            progress_box.addSpacing(6)
+            progress_box.addSpacing(8)
 
         self.track_bar = QProgressBar()
         self.track_bar.setRange(0, 100)
         self.track_bar.setValue(0)
         if HAVE_QT:
-            self.track_bar.setFixedHeight(16)
+            self.track_bar.setFixedHeight(20)
         progress_box.addWidget(self.track_bar)
 
         if HAVE_QT:
-            progress_box.addSpacing(10)
+            progress_box.addSpacing(22)
 
-        self.overall_label = QLabel("Overall Album: 0%")
-        self.overall_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #F3F4F6;")
+        self.overall_label = QLabel("Overall Album Progress")
+        self.overall_label.setStyleSheet("font-size: 12px; font-weight: 600; color: #9CA3AF; letter-spacing: 0.3px;")
         self.overall_label.setAlignment(Qt.AlignCenter)
         if HAVE_QT:
             self.overall_label.setFixedHeight(18)
         progress_box.addWidget(self.overall_label)
 
         if HAVE_QT:
-            progress_box.addSpacing(6)
+            progress_box.addSpacing(8)
 
         self.overall_bar = QProgressBar()
         self.overall_bar.setRange(0, 100)
         self.overall_bar.setValue(0)
         if HAVE_QT:
-            self.overall_bar.setFixedHeight(16)
+            self.overall_bar.setFixedHeight(20)
         progress_box.addWidget(self.overall_bar)
 
         active_box.addLayout(progress_box)
 
         if HAVE_QT:
-            active_box.addSpacing(14)
+            active_box.addSpacing(18)
 
         # 2. Telemetry Status Pills
         telemetry_row = QHBoxLayout()
@@ -576,7 +576,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         active_box.addLayout(telemetry_row)
 
         if HAVE_QT:
-            active_box.addSpacing(14)
+            active_box.addSpacing(18)
 
         # 3. Nostalgic Memories Ticker Card
         self.memory_card = QFrame()
@@ -760,7 +760,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.track_bar.setValue(0)
         self.overall_bar.setValue(0)
         self.track_label.setText("Extracting")
-        self.overall_label.setText("Overall Album: 0%")
+        self.overall_label.setText("Overall Album Progress")
         self.badge_retries.setText("🟢 Retries: 0")
         self.badge_retries.setStyleSheet("background: #1A1A22; color: #10B981; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;")
         self.badge_errors.setText("🟢 Errors: 0")
@@ -860,7 +860,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         self.track_bar.setValue(track_pct)
         self.overall_bar.setValue(overall_pct)
-        self.overall_label.setText(f"Overall Album Progress: {overall_pct}%")
+        self.overall_label.setText("Overall Album Progress")
 
         # Hardware read status & codec signaling
         if is_encoding:
