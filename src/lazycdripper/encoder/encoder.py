@@ -146,6 +146,12 @@ class AudioEncoder:
         """Execute encoder subprocess with CREATE_NO_WINDOW on Windows and error logging."""
         try:
             creationflags = 0x08000000 if os.name == "nt" else 0
+            bin_path = Path(cmd[0])
+            env = os.environ.copy()
+            if bin_path.is_file():
+                bin_dir = str(bin_path.resolve().parent)
+                env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
+
             res = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -154,6 +160,7 @@ class AudioEncoder:
                 errors="replace",
                 timeout=120,
                 creationflags=creationflags,
+                env=env,
             )
             if res.returncode == 0:
                 return True

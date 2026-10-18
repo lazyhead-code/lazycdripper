@@ -160,22 +160,12 @@ def ensure_encoders(progress_callback: Optional[Callable[[int, int], None]] = No
             with urllib.request.urlopen(req, timeout=60) as resp:
                 flac_zip_data = resp.read()
             with zipfile.ZipFile(io.BytesIO(flac_zip_data)) as z:
-                flac_entry = None
-                for name in z.namelist():
-                    if name.endswith("flac.exe") and "win64" in name.lower():
-                        flac_entry = name
-                        break
-                if not flac_entry:
-                    for name in z.namelist():
-                        if name.endswith("flac.exe"):
-                            flac_entry = name
-                            break
-                if flac_entry:
-                    target_flac = dest_dir / "flac.exe"
-                    target_flac.write_bytes(z.read(flac_entry))
-                    logger.info("Installed standalone FLAC to %s", target_flac)
-                else:
-                    logger.error("flac.exe not found inside downloaded FLAC zip")
+                for entry in z.namelist():
+                    lower = entry.lower()
+                    if "win64" in lower and (lower.endswith(".exe") or lower.endswith(".dll")):
+                        target_file = dest_dir / Path(entry).name
+                        target_file.write_bytes(z.read(entry))
+                        logger.info("Installed FLAC component to %s", target_file)
         except Exception as err:
             logger.error("Failed to download FLAC binary: %s", err)
 

@@ -170,7 +170,7 @@ class TestGuiThemeAndContent(unittest.TestCase):
         if hasattr(view, "headline"):
             self.assertEqual(view.headline.text(), 'Track 2 of 10: "Something"')
             self.assertEqual(view.track_label.text(), "Transcoding")
-            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + MP3")
+            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + Lossy MP3")
 
         # Test track title resolution via AlbumInfo set_album
         from lazycdripper.core.models import AlbumInfo, TrackInfo

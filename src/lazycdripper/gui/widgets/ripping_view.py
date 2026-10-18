@@ -851,7 +851,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         # Hardware read status & codec signaling
         if is_encoding:
-            self.status_sub.setText("Encoding  •  Lossless FLAC + MP3")
+            self.status_sub.setText("Encoding  •  Lossless FLAC + Lossy MP3")
         elif is_tagging:
             self.status_sub.setText("Embedding metadata & cover art")
         elif progress.current_speed:

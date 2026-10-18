@@ -44,7 +44,7 @@ jobs:
           # Download FLAC Win64 from Xiph.org
           curl.exe -L -o flac.zip "https://github.com/xiph/flac/releases/download/1.4.3/flac-1.4.3-win.zip"
           Expand-Archive -Path flac.zip -DestinationPath flac_extracted -Force
-          Get-ChildItem -Path flac_extracted -Filter "flac.exe" -Recurse | Where-Object { $_.FullName -like "*Win64*" } | Select-Object -First 1 | Move-Item -Destination bin/flac.exe -Force
+          Get-ChildItem -Path flac_extracted -Include "*.exe", "*.dll" -Recurse | Where-Object { $_.FullName -like "*Win64*" } | Move-Item -Destination bin/ -Force
           Remove-Item -Recurse -Force flac.zip, flac_extracted
 
           # Download LAME 4.0 x64 from RareWares
