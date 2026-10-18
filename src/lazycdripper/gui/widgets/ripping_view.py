@@ -684,7 +684,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             f"font-size: 18px; font-weight: 700; color: {title_color}; padding: 2px 4px; min-height: 24px;"
         )
         self.status_sub.setStyleSheet("font-size: 13px; color: #D1D5DB;")
-        self.status_sub.setAlignment(Qt.AlignCenter)
+        self.status_sub.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.status_sub.setWordWrap(False)
         self.status_sub.setText(report.human_readable_summary)
 

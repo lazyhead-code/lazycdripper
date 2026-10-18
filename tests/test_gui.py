@@ -961,7 +961,7 @@ class TestTrackTableWidget(unittest.TestCase):
         self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
-        self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.status_sub.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         # Sloth completion mascot is displayed in place of transport disc
         self.assertTrue(view.sloth_emblem.isVisible())
         self.assertFalse(view.transport_widget.isVisible())
@@ -1149,7 +1149,7 @@ class TestTrackTableWidget(unittest.TestCase):
         # 4. Alignment checks on completion view (both success and failure)
         rep = AlbumRipReport(album_title="Test", artist="Artist", total_tracks=1, overall_status="pristine")
         view.show_completion(rep)
-        self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.status_sub.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
         self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignLeft | Qt.AlignVCenter)
