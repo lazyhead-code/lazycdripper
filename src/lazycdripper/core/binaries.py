@@ -181,7 +181,7 @@ def ensure_encoders(progress_callback: Optional[Callable[[int, int], None]] = No
 
     # Download LAME if missing
     if not is_binary_available(find_binary("lame")):
-        lame_url = "https://www.rarewares.org/files/mp3/lame-3.101.b3-q4patched-x64.zip"
+        lame_url = "https://www.rarewares.org/files/mp3/lame-4.0-x64-q4-patched.zip"
         logger.info("Downloading standalone LAME binary from %s...", lame_url)
         try:
             req = urllib.request.Request(lame_url, headers={"User-Agent": "LazyCDRipper/1.0"})
@@ -190,12 +190,12 @@ def ensure_encoders(progress_callback: Optional[Callable[[int, int], None]] = No
             with zipfile.ZipFile(io.BytesIO(lame_zip_data)) as z:
                 for entry in z.namelist():
                     lower = entry.lower()
-                    if lower.endswith("lame.exe"):
-                        target_lame = dest_dir / "lame.exe"
-                        target_lame.write_bytes(z.read(entry))
-                        logger.info("Installed standalone LAME to %s", target_lame)
-                    elif lower.endswith("lame_enc.dll"):
-                        target_dll = dest_dir / "lame_enc.dll"
+                    if lower.endswith(".exe"):
+                        target_exe = dest_dir / Path(entry).name
+                        target_exe.write_bytes(z.read(entry))
+                        logger.info("Installed standalone LAME executable to %s", target_exe)
+                    elif lower.endswith(".dll"):
+                        target_dll = dest_dir / Path(entry).name
                         target_dll.write_bytes(z.read(entry))
                         logger.info("Installed standalone LAME DLL to %s", target_dll)
         except Exception as err:

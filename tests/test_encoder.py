@@ -113,7 +113,7 @@ class TestAudioEncoder(unittest.TestCase):
             if "flac" in cmd[0]:
                 return MagicMock(returncode=0, stdout="flac 1.4.3\nCopyright (C) ...")
             elif "lame" in cmd[0]:
-                return MagicMock(returncode=0, stdout="LAME 64bits version 3.101 (http://lame.sf.net)")
+                return MagicMock(returncode=0, stdout="LAME 64bits version 4.0 (http://lame.sf.net)")
             return MagicMock(returncode=1, stdout="")
 
         mock_run.side_effect = fake_run
@@ -121,7 +121,7 @@ class TestAudioEncoder(unittest.TestCase):
             encoder = AudioEncoder(flac_path="/usr/bin/flac", lame_path="/usr/bin/lame")
             version = encoder.get_version()
             self.assertIn("FLAC 1.4.3", version)
-            self.assertIn("LAME 3.101", version)
+            self.assertIn("LAME 4.0", version)
 
 
 if __name__ == "__main__":
