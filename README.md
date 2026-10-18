@@ -13,9 +13,9 @@
 The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just press the button!
 - **Both Formats in One Pass:** Never choose between archival quality and mobile convenience. You always get both:
   - **FLAC Lossless (Perfect CD copy):** Bit-perfect original CD (16-bit / 44.1 kHz) master with Level 8 archival compression and MD5 stream verification.
-  - **AAC Lossy (Compressed but still great):** High-bitrate Fraunhofer FDK-AAC (256k VBR in `.m4a`), ready for phones and native Bluetooth headphone listening without cross-codec transcode artifacts.
+  - **MP3 Lossy (Compressed but still great):** Audiophile LAME Constant Bitrate (320 kbps CBR, `-q 0` in `.mp3`), 100% patent-free worldwide, compatible with every vehicle, smartphone, and stereo in existence.
 - **Automatic Metadata & High-Res Artwork:** MusicBrainz disc ID lookup + canonical front covers from the Cover Art Archive embedded in every track, plus a companion `cover.jpg` for media servers.
-- **Sensible Organization:** Clean, zero-padded filenames in dedicated folders (`Artist - Album (Year) [FLAC]/` and `[AAC]/`).
+- **Sensible Organization:** Clean, zero-padded filenames in dedicated folders (`Artist - Album (Year) [FLAC]/` and `[MP3]/`).
 
 ---
 
@@ -28,7 +28,7 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 > 
 > We don't have CD drives in cars and laptops anymore. But we can rip music for ourselves (all it takes is an external drive), copy it to our phone, and have the exact same experience.  
 > 
-> This application is opinionated AF, but it rips to virtually the best options: high-quality AAC and FLAC. Why AAC instead of MP3? Because modern Bluetooth headphones use AAC natively; using a lossy codec from a different family is not optimal. Why FLAC? Because it's a picture-perfect copy of your CD—highest possible quality. We may not really hear the difference much, but I'm glad to surrender to an illusion :)  
+> This application is opinionated AF, but it rips to virtually the best options: high-quality MP3 (320 kbps CBR) and FLAC. Why MP3 instead of other lossy formats? Because MP3 is 100% patent-free worldwide, universally supported by every car, stereo, and device on Earth, and at 320 kbps CBR it is perceptually transparent. Why FLAC? Because it's a picture-perfect copy of your CD—highest possible quality. We may not really hear the difference much, but I'm glad to surrender to an illusion :)  
 > 
 > Have fun and welcome back to the magical world of music!  
 > 
@@ -40,7 +40,7 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 ## Release Notes
 
 ### v0.9.3 — *"Peace... Like a River"* (October 2026)
-- **Human-Friendly Quality Clarifications:** Clarified codec selections for everyday audiophiles—FLAC Lossless labeled as *"Perfect CD copy"* and AAC Lossy as *"Compressed but still great"*—while preserving exact encoder flags and bitrates for those who care.
+- **Human-Friendly Quality Clarifications:** Clarified codec selections for everyday audiophiles—FLAC Lossless labeled as *"Perfect CD copy"* and MP3 Lossy as *"Compressed but still great"*—while preserving exact encoder flags and bitrates for those who care.
 - **Central-Axis Alignment & Layout Clamping:** Centered all active ripping and completion screens along a strict vertical axis (`Qt.AlignCenter`), eliminated element drift when expanding or maximizing the window, and guaranteed custom window dimensions persist seamlessly across all screen transitions.
 - **Tactile 3D Mascot Medallions:** Added crafted 3D pewter and gunmetal rock sloth medallions with a knurled bezel for completion states (Happy thumbs-up for bit-perfect/recovered rips, and Sad thumbs-down for scratched disc surface damage), rendered at 0.96 scale factor to prevent edge clipping.
 - **Session-Wide Error Telemetry:** Unified real-time sector error and retry tracking across individual tracks and final verdict summaries with three-state LED status signaling (Pristine Green, Amber Warning, Crimson Error).
@@ -68,15 +68,15 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 1. **Hardware & TOC:** Direct Win32 `IOCTL_CDROM_READ_TOC` and SCSI storage property queries.
 2. **Ripper Engine:** Native Win32 sector-by-sector CDDA extraction with hardware buffer alignment, gap padding, and retry recovery (`windows.py`).
 3. **Metadata Client:** MusicBrainz WS2 JSON API + Cover Art Archive image ranking.
-4. **Encoding Pipeline:** Parallel lossless FLAC and Fraunhofer FDK-AAC encoding via FFmpeg.
-5. **Tagging:** Mutagen handles Vorbis comment blocks and MP4 atoms with high-res cover art embedding.
+4. **Encoding Pipeline:** Parallel lossless FLAC and LAME MP3 (320 kbps CBR) encoding via standalone `flac.exe` and `lame.exe` binaries (< 2.5 MB total footprint, executed silently via `CREATE_NO_WINDOW`).
+5. **Tagging:** Mutagen handles Vorbis comment blocks and ID3v2.3 tags with high-res cover art embedding.
 
 ---
 
 ## Acknowledgments & Credits
 
 Lazy CD Ripper is proudly built on open-source technologies:
-- **FFmpeg** — Audio encoding engine (FLAC & AAC)
+- **FLAC (Xiph.org)** & **LAME** — Official standalone audio encoding engines (FLAC & MP3)
 - **Mutagen** — Audio metadata tagger & cover art embedder
 - **Qt 6 / PySide6** — Hi-DPI desktop GUI framework
 - **MusicBrainz WS2** — Global acoustic CD metadata discovery via `musicbrainzngs`
