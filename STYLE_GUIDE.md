@@ -83,7 +83,7 @@ When the user enlarges or maximizes the application window, **UI elements must s
 | :--- | :--- | :--- | :--- |
 | **`track_label`** | 18px | 8px | Fixed height, `Qt.AlignCenter` |
 | **`track_bar`** | 20px | 22px | Fixed height analog progress meter |
-| **`overall_label`** | 18px | 8px | Fixed height, `Qt.AlignCenter`, muted secondary |
+| **`overall_label`** | 18px | 8px | Fixed height, `Qt.AlignCenter`, `#F3F4F6` |
 | **`overall_bar`** | 20px | 18px | Fixed height analog progress meter |
 | **`telemetry_row`** | 24px | 18px | Fixed height badges (`Retries: N`, `Errors: N`) |
 | **`memory_card`** | 72px | — | Fixed height preview card |

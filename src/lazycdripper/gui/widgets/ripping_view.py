@@ -535,7 +535,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             progress_box.addSpacing(22)
 
         self.overall_label = QLabel("Overall Album Progress")
-        self.overall_label.setStyleSheet("font-size: 12px; font-weight: 600; color: #9CA3AF; letter-spacing: 0.3px;")
+        self.overall_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #F3F4F6;")
         self.overall_label.setAlignment(Qt.AlignCenter)
         if HAVE_QT:
             self.overall_label.setFixedHeight(18)
