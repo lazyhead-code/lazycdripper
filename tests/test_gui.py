@@ -39,8 +39,10 @@ class TestGuiThemeAndContent(unittest.TestCase):
         self.assertIn("artworkFrame", DARK_ROCK_STYLESHEET)
         self.assertIn("padding: 0px;", DARK_ROCK_STYLESHEET)
         self.assertIn("QScrollBar:vertical", DARK_ROCK_STYLESHEET)
-        self.assertIn("margin: 10px 2px 10px 2px;", DARK_ROCK_STYLESHEET)
+        self.assertIn("margin: 0px;", DARK_ROCK_STYLESHEET)
         self.assertIn("min-height: 38px;", DARK_ROCK_STYLESHEET)
+        self.assertIn("border-radius: 10px;", DARK_ROCK_STYLESHEET)
+        self.assertIn("border-radius: 9px;", DARK_ROCK_STYLESHEET)
         self.assertIn("QHeaderView", DARK_ROCK_STYLESHEET)
         self.assertIn("QTableWidget", DARK_ROCK_STYLESHEET)
 

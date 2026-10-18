@@ -251,8 +251,8 @@ QHeaderView::section {{
 QProgressBar {{
     background-color: #15151C;
     border: 1px solid {COLOR_BORDER};
-    border-radius: 6px;
-    height: 18px;
+    border-radius: 10px;
+    height: 20px;
     text-align: center;
     font-size: 11px;
     font-weight: 600;
@@ -262,16 +262,16 @@ QProgressBar {{
 QProgressBar::chunk {{
     background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
         stop:0 {COLOR_AMBER_DARK}, stop:1 {COLOR_AMBER_HOVER});
-    border-radius: 5px;
+    border-radius: 9px;
 }}
 
 /* Ergonomic Floating Pill Scrollbars (Comfortable, fat target, rounded capsule track and handle) */
 QScrollBar:vertical {{
     background-color: #181820;
-    width: 14px;
-    margin: 10px 2px 10px 2px;
-    border: 1px solid transparent;
-    border-radius: 7px;
+    width: 12px;
+    margin: 0px;
+    border: none;
+    border-radius: 6px;
 }}
 
 QScrollBar:vertical:hover {{
@@ -281,8 +281,8 @@ QScrollBar:vertical:hover {{
 QScrollBar::handle:vertical {{
     background-color: #424154;
     min-height: 38px;
-    border-radius: 5px;
-    margin: 1px;
+    border: none;
+    border-radius: 6px;
 }}
 
 QScrollBar::handle:vertical:hover {{
@@ -294,23 +294,23 @@ QScrollBar::handle:vertical:pressed {{
 }}
 
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
-    background: transparent;
+    background: none;
     border: none;
 }}
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
     height: 0px;
     width: 0px;
-    background: transparent;
+    background: none;
     border: none;
 }}
 
 QScrollBar:horizontal {{
     background-color: #181820;
-    height: 14px;
-    margin: 2px 10px 2px 10px;
-    border: 1px solid transparent;
-    border-radius: 7px;
+    height: 12px;
+    margin: 0px;
+    border: none;
+    border-radius: 6px;
 }}
 
 QScrollBar:horizontal:hover {{
@@ -320,8 +320,8 @@ QScrollBar:horizontal:hover {{
 QScrollBar::handle:horizontal {{
     background-color: #424154;
     min-width: 38px;
-    border-radius: 5px;
-    margin: 1px;
+    border: none;
+    border-radius: 6px;
 }}
 
 QScrollBar::handle:horizontal:hover {{
@@ -333,14 +333,14 @@ QScrollBar::handle:horizontal:pressed {{
 }}
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
-    background: transparent;
+    background: none;
     border: none;
 }}
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{
     height: 0px;
     width: 0px;
-    background: transparent;
+    background: none;
     border: none;
 }}
 
