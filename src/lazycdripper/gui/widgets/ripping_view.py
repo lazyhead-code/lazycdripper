@@ -1,5 +1,6 @@
 """Ripping view screen featuring the nostalgic vinyl/CD visual and rotating memories ticker."""
 
+import html
 import math
 from pathlib import Path
 import random
@@ -617,12 +618,16 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         out_layout = QVBoxLayout(self.output_card)
         out_layout.setSpacing(10)
         out_layout.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        self.flac_dir_label = QLabel("📁 [FLAC] - Perfect CD copy")
-        self.flac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
+        self.flac_dir_label = QLabel("📁  <b style='color: #F9FAFB;'>[FLAC]</b> <span style='color: #636270;'>•</span> <span style='color: #9CA3AF; font-size: 12px; font-weight: 400;'>Perfect CD copy</span>")
+        if HAVE_QT:
+            self.flac_dir_label.setTextFormat(Qt.RichText)
+        self.flac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px;")
         self.flac_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         out_layout.addWidget(self.flac_dir_label, alignment=Qt.AlignLeft)
-        self.mp3_dir_label = QLabel("📁 [MP3] - Compressed but still great")
-        self.mp3_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
+        self.mp3_dir_label = QLabel("📁  <b style='color: #F9FAFB;'>[MP3]</b> <span style='color: #636270;'>•</span> <span style='color: #9CA3AF; font-size: 12px; font-weight: 400;'>Compressed but still great</span>")
+        if HAVE_QT:
+            self.mp3_dir_label.setTextFormat(Qt.RichText)
+        self.mp3_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px;")
         self.mp3_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         out_layout.addWidget(self.mp3_dir_label, alignment=Qt.AlignLeft)
         self.aac_dir_label = self.mp3_dir_label  # Backward-compatible attribute alias
@@ -695,8 +700,16 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
             mp3_mb = mp3_bytes / (1024 * 1024)
             flac_title = report.flac_directory.name if report.flac_directory else "[FLAC]"
             mp3_title = mp3_dir.name if mp3_dir else "[MP3]"
-            self.flac_dir_label.setText(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
-            self.mp3_dir_label.setText(f"📁  {mp3_title} - Compressed but still great ({mp3_mb:.1f} MB)")
+            self.flac_dir_label.setText(
+                f"📁  <b style='color: #F9FAFB;'>{html.escape(flac_title)}</b> "
+                f"<span style='color: #636270;'>•</span> "
+                f"<span style='color: #9CA3AF; font-size: 12px; font-weight: 400;'>Perfect CD copy ({flac_mb:.1f} MB)</span>"
+            )
+            self.mp3_dir_label.setText(
+                f"📁  <b style='color: #F9FAFB;'>{html.escape(mp3_title)}</b> "
+                f"<span style='color: #636270;'>•</span> "
+                f"<span style='color: #9CA3AF; font-size: 12px; font-weight: 400;'>Compressed but still great ({mp3_mb:.1f} MB)</span>"
+            )
             self.flac_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.mp3_dir_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
             self.output_card.setVisible(True)

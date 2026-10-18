@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 from pathlib import Path
 import subprocess
 from typing import Optional
@@ -162,12 +163,24 @@ class CompletionDialog(QDialog if HAVE_QT else object):
 
             flac_title = self.report.flac_directory.name if self.report.flac_directory else "[FLAC]"
             mp3_title = mp3_dir.name if mp3_dir else "[MP3]"
-            flac_label = QLabel(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
-            flac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
+            flac_label = QLabel(
+                f"📁  <b style='color: #F9FAFB;'>{html.escape(flac_title)}</b> "
+                f"<span style='color: #636270;'>•</span> "
+                f"<span style='color: #9CA3AF; font-size: 12px; font-weight: 400;'>Perfect CD copy ({flac_mb:.1f} MB)</span>"
+            )
+            if HAVE_QT:
+                flac_label.setTextFormat(Qt.RichText)
+            flac_label.setStyleSheet("color: #F3F4F6; font-size: 12px;")
             output_box.addWidget(flac_label)
 
-            mp3_label = QLabel(f"📁  {mp3_title} - Compressed but still great ({mp3_mb:.1f} MB)")
-            mp3_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
+            mp3_label = QLabel(
+                f"📁  <b style='color: #F9FAFB;'>{html.escape(mp3_title)}</b> "
+                f"<span style='color: #636270;'>•</span> "
+                f"<span style='color: #9CA3AF; font-size: 12px; font-weight: 400;'>Compressed but still great ({mp3_mb:.1f} MB)</span>"
+            )
+            if HAVE_QT:
+                mp3_label.setTextFormat(Qt.RichText)
+            mp3_label.setStyleSheet("color: #F3F4F6; font-size: 12px;")
             output_box.addWidget(mp3_label)
 
             main_layout.addLayout(output_box)

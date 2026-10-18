@@ -265,22 +265,31 @@ QProgressBar::chunk {{
     border-radius: 5px;
 }}
 
-/* Minimalist Precision Scrollbars (Floating Pills, insetting past curved corners) */
+/* Ergonomic Floating Pill Scrollbars (Comfortable, fat target, insetting past curved corners) */
 QScrollBar:vertical {{
     background: transparent;
-    width: 6px;
-    margin: 14px 4px 14px 0px;
+    width: 16px;
+    margin: 10px 2px 10px 2px;
     border: none;
 }}
 
+QScrollBar:vertical:hover {{
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}}
+
 QScrollBar::handle:vertical {{
-    background-color: #383745;
-    min-height: 28px;
-    border-radius: 3px;
+    background-color: #424154;
+    min-height: 38px;
+    border-radius: 6px;
 }}
 
 QScrollBar::handle:vertical:hover {{
     background-color: {COLOR_AMBER};
+}}
+
+QScrollBar::handle:vertical:pressed {{
+    background-color: {COLOR_AMBER_HOVER};
 }}
 
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
@@ -297,19 +306,28 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
 
 QScrollBar:horizontal {{
     background: transparent;
-    height: 6px;
-    margin: 0px 14px 4px 14px;
+    height: 16px;
+    margin: 2px 10px 2px 10px;
     border: none;
 }}
 
+QScrollBar:horizontal:hover {{
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}}
+
 QScrollBar::handle:horizontal {{
-    background-color: #383745;
-    min-width: 28px;
-    border-radius: 3px;
+    background-color: #424154;
+    min-width: 38px;
+    border-radius: 6px;
 }}
 
 QScrollBar::handle:horizontal:hover {{
     background-color: {COLOR_AMBER};
+}}
+
+QScrollBar::handle:horizontal:pressed {{
+    background-color: {COLOR_AMBER_HOVER};
 }}
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {{
