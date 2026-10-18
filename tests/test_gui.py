@@ -129,7 +129,7 @@ class TestGuiThemeAndContent(unittest.TestCase):
         if hasattr(view, "headline"):
             self.assertEqual(view.headline.text(), "Track 2 of 10")
             self.assertEqual(view.track_label.text(), "Transcoding")
-            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + MP3")
+            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + Lossy MP3")
 
         # Test tagging progress state
         prog_tag = RipProgress(
