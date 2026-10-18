@@ -37,8 +37,8 @@ class CreditsDialog(QDialog if HAVE_QT else object):
             return
         super().__init__(parent)
         self.setWindowTitle("Credits — Lazy CD Ripper")
-        self.setMinimumSize(560, 520)
-        self.resize(560, 520)
+        self.setMinimumSize(560, 550)
+        self.resize(560, 550)
         self.setStyleSheet(DARK_ROCK_STYLESHEET)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setAutoFillBackground(True)
@@ -46,12 +46,12 @@ class CreditsDialog(QDialog if HAVE_QT else object):
 
     def sizeHint(self):
         if HAVE_QT:
-            return QSize(560, 520)
+            return QSize(560, 550)
         return super().sizeHint() if hasattr(super(), "sizeHint") else None
 
     def minimumSizeHint(self):
         if HAVE_QT:
-            return QSize(560, 520)
+            return QSize(560, 550)
         return super().minimumSizeHint() if hasattr(super(), "minimumSizeHint") else None
 
     def paintEvent(self, event):
@@ -68,8 +68,8 @@ class CreditsDialog(QDialog if HAVE_QT else object):
 
     def _setup_ui(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(24, 22, 24, 22)
-        main_layout.setSpacing(14)
+        main_layout.setContentsMargins(24, 20, 24, 20)
+        main_layout.setSpacing(12)
 
         # 1. Header Plaque
         header_container = QVBoxLayout()
@@ -96,10 +96,11 @@ class CreditsDialog(QDialog if HAVE_QT else object):
         card = QFrame()
         card.setObjectName("cardPanel")
         card.setStyleSheet(
-            "QFrame#cardPanel { background-color: #14141A; border: 1px solid #24242E; border-radius: 12px; padding: 18px; }"
+            "QFrame#cardPanel { background-color: #14141A; border: 1px solid #24242E; border-radius: 12px; }"
         )
         card_layout = QVBoxLayout(card)
-        card_layout.setSpacing(14)
+        card_layout.setContentsMargins(18, 16, 18, 16)
+        card_layout.setSpacing(11)
 
         # Section: Open-Source Core Engines
         sec1_title = QLabel("OPEN-SOURCE CORE ENGINES")

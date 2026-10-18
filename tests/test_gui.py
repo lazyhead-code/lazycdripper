@@ -1092,11 +1092,11 @@ class TestTrackTableWidget(unittest.TestCase):
 
         credits_dlg = CreditsDialog()
         self.assertEqual(credits_dlg.minimumSize().width(), 560)
-        self.assertEqual(credits_dlg.minimumSize().height(), 520)
+        self.assertEqual(credits_dlg.minimumSize().height(), 550)
         self.assertEqual(credits_dlg.sizeHint().width(), 560)
-        self.assertEqual(credits_dlg.sizeHint().height(), 520)
+        self.assertEqual(credits_dlg.sizeHint().height(), 550)
         self.assertEqual(credits_dlg.minimumSizeHint().width(), 560)
-        self.assertEqual(credits_dlg.minimumSizeHint().height(), 520)
+        self.assertEqual(credits_dlg.minimumSizeHint().height(), 550)
 
         notes_dlg = LinerNotesDialog()
         self.assertEqual(notes_dlg.minimumSize().width(), 540)
