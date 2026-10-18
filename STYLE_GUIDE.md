@@ -126,17 +126,17 @@ When the user enlarges or maximizes the application window, **UI elements must s
   - **Happy Sloth (Success / Pristine / Recovered):** Confident smile, dark sunglasses, leather motorcycle jacket, thumbs-up claw gesture.
   - **Sad Sloth (Degraded / Damaged / Failed):** Visibly sorrowful frown, dark sunglasses tipped down looking up with sympathetic eyes, thumbs-down claw gesture.
 
-### 5.3 Windows Store App Icon (`assets/images/store_icon_tight.jpg`)
-- **Composition:** Extreme close-up bust focusing tightly on the heavy metal sloth mascot's face and upper torso to maximize recognition at small tile sizes (48×48 to 150×150 px).
+### 5.3 Windows Store App Icon (`assets/images/store_icon.jpg` / `store_icon_tight.jpg`)
+- **Composition:** High-impact close-up bust focusing tightly on the heavy metal sloth mascot's face and upper torso to maximize recognition at small tile sizes (48×48 to 150×150 px).
 - **Hero Features:**
-  - Sculpted cast pewter and brushed silver metal fur with polished chrome highlights.
-  - Dark aviator rock sunglasses with radiant, iridescent rainbow Compact Disc holographic spectral reflections mirrored across both lenses.
-  - Metallic claw hand holding a brilliant rainbow holographic Compact Disc right next to his rock smirk.
+  - Sculpted cast pewter, antique gunmetal, and brushed silver metal fur with polished chrome highlights matching the completion medallion aesthetic.
+  - Sleek dark-tinted aviator sunglasses with natural glass specular highlights and subtle warm reflections (no laser/rainbow eye glare).
+  - Metallic claw hand holding a brilliant rainbow holographic Compact Disc with authentic spectral refraction right next to his rock smirk.
   - Classic vintage motorcycle leather jacket with metallic studs and warm subtle vacuum-tube amber rim lighting (`#FF9E3B`).
   - Pure solid black background (`#000000`) for seamless app icon masking and store packaging.
 - **File Asset Paths:**
-  - Tight Close-up (Primary Store Icon): [`assets/images/store_icon_tight.jpg`](file:///home/nduhovnijs/projects/lazycdripper/assets/images/store_icon_tight.jpg)
-  - Full Bust Portrait (Alternative Asset): [`assets/images/store_icon.jpg`](file:///home/nduhovnijs/projects/lazycdripper/assets/images/store_icon.jpg)
+  - Primary Store Icon: [`assets/images/store_icon.jpg`](file:///home/nduhovnijs/projects/lazycdripper/assets/images/store_icon.jpg)
+  - Companion Asset (Tight Focus): [`assets/images/store_icon_tight.jpg`](file:///home/nduhovnijs/projects/lazycdripper/assets/images/store_icon_tight.jpg)
 
 ---
 

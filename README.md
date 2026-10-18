@@ -39,6 +39,13 @@ The audio CD ripper for Windows 11 with zero settings. Defaults are great. Just 
 
 ## Release Notes
 
+### v0.9.4 — *"Peace... Like a River"* (October 2026)
+- **Standalone Dedicated Encoders (FLAC + MP3):** Replaced monolithic FFmpeg dependency with high-performance standalone `flac.exe` and `lame.exe` (LAME 4.0 q4-patched with companion DLLs), switching lossy compression to patent-free MP3 CBR 320 kbps with zero external codecs or system dependencies required.
+- **Refined Windows Store Mascot Icon:** Updated store app icons (`store_icon.jpg` and `store_icon_tight.jpg`) with sleek dark-tinted aviator lenses, realistic glass depth, and warm vacuum-tube amber lighting matching the completion medallion palette.
+- **Ergonomic Capsule Progress Meters & Scrollbars:** Implemented mathematically seamless rounded capsule geometry across all progress bars and scrollbars (`border-radius: 10px` on progress container, `9px` on chunk; `12px` wide scrollbar with `6px` radius on track and handle).
+- **Ripping View Decompression & 960px Wide Containers:** Expanded active ripping containers to 960px with relaxed 20px progress bars and 22px inter-meter separation, ensuring nostalgic quotes fit comfortably without multi-line wrapping.
+- **Visual Polish & Layout Realignment:** Aligned completion output folder links and diagnostic bullet points to the left, matched overall progress labels to crisp white `#F3F4F6`, and fixed Credits dialog vertical height clamping to prevent text clipping.
+
 ### v0.9.3 — *"Peace... Like a River"* (October 2026)
 - **Human-Friendly Quality Clarifications:** Clarified codec selections for everyday audiophiles—FLAC Lossless labeled as *"Perfect CD copy"* and MP3 Lossy as *"Compressed but still great"*—while preserving exact encoder flags and bitrates for those who care.
 - **Central-Axis Alignment & Layout Clamping:** Centered all active ripping and completion screens along a strict vertical axis (`Qt.AlignCenter`), eliminated element drift when expanding or maximizing the window, and guaranteed custom window dimensions persist seamlessly across all screen transitions.
