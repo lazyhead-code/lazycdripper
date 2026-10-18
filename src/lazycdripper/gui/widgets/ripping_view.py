@@ -621,10 +621,11 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
         self.flac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
         self.flac_dir_label.setAlignment(Qt.AlignCenter)
         out_layout.addWidget(self.flac_dir_label, alignment=Qt.AlignCenter)
-        self.aac_dir_label = QLabel("📁 [AAC] - Compressed but still great")
-        self.aac_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
-        self.aac_dir_label.setAlignment(Qt.AlignCenter)
-        out_layout.addWidget(self.aac_dir_label, alignment=Qt.AlignCenter)
+        self.mp3_dir_label = QLabel("📁 [MP3] - Compressed but still great")
+        self.mp3_dir_label.setStyleSheet("color: #F3F4F6; font-size: 13px; font-weight: 600;")
+        self.mp3_dir_label.setAlignment(Qt.AlignCenter)
+        out_layout.addWidget(self.mp3_dir_label, alignment=Qt.AlignCenter)
+        self.aac_dir_label = self.mp3_dir_label  # Backward-compatible attribute alias
         comp_box.addWidget(self.output_card, alignment=Qt.AlignCenter)
 
         # Action Buttons Row
@@ -689,13 +690,15 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         if report.successful_tracks_count > 0:
             flac_mb = report.flac_size_bytes / (1024 * 1024)
-            aac_mb = report.aac_size_bytes / (1024 * 1024)
+            mp3_bytes = report.mp3_size_bytes or report.aac_size_bytes
+            mp3_dir = report.mp3_directory or report.aac_directory
+            mp3_mb = mp3_bytes / (1024 * 1024)
             flac_title = report.flac_directory.name if report.flac_directory else "[FLAC]"
-            aac_title = report.aac_directory.name if report.aac_directory else "[AAC]"
+            mp3_title = mp3_dir.name if mp3_dir else "[MP3]"
             self.flac_dir_label.setText(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
-            self.aac_dir_label.setText(f"📁  {aac_title} - Compressed but still great ({aac_mb:.1f} MB)")
+            self.mp3_dir_label.setText(f"📁  {mp3_title} - Compressed but still great ({mp3_mb:.1f} MB)")
             self.flac_dir_label.setAlignment(Qt.AlignCenter)
-            self.aac_dir_label.setAlignment(Qt.AlignCenter)
+            self.mp3_dir_label.setAlignment(Qt.AlignCenter)
             self.output_card.setVisible(True)
             self.btn_open_rip.setVisible(bool(report.rip_folder))
         else:
@@ -848,7 +851,7 @@ class RippingViewWidget(QWidget if HAVE_QT else object):
 
         # Hardware read status & codec signaling
         if is_encoding:
-            self.status_sub.setText("Encoding  •  Lossless FLAC + AAC")
+            self.status_sub.setText("Encoding  •  Lossless FLAC + MP3")
         elif is_tagging:
             self.status_sub.setText("Embedding metadata & cover art")
         elif progress.current_speed:

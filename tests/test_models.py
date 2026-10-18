@@ -1,5 +1,6 @@
 """Unit tests for domain models."""
 
+from pathlib import Path
 import unittest
 from lazycdripper.core.models import (
     AlbumInfo,
@@ -87,6 +88,7 @@ class TestModels(unittest.TestCase):
 
     def test_audio_format_enum(self):
         self.assertEqual(AudioFormat.FLAC.value, "flac")
+        self.assertEqual(AudioFormat.MP3.value, "mp3")
         self.assertEqual(AudioFormat.AAC.value, "aac")
 
     def test_album_rip_report_clean_headline(self):
@@ -135,6 +137,31 @@ class TestModels(unittest.TestCase):
         t2 = TrackRipReport(track_number=2, title="Track 2", read_errors=5)
         self.assertEqual(t2.unrecoverable_errors, 5)
         self.assertEqual(t2.read_errors, 5)
+
+        # mp3_path and aac_path backward compatibility alias syncing
+        mp3_p = Path("/tmp/01.mp3")
+        t3 = TrackRipReport(track_number=3, title="Track 3", mp3_path=mp3_p)
+        self.assertEqual(t3.mp3_path, mp3_p)
+        self.assertEqual(t3.aac_path, mp3_p)
+
+        aac_p = Path("/tmp/04.m4a")
+        t4 = TrackRipReport(track_number=4, title="Track 4", aac_path=aac_p)
+        self.assertEqual(t4.mp3_path, aac_p)
+        self.assertEqual(t4.aac_path, aac_p)
+
+    def test_album_rip_report_mp3_aliases(self):
+        from lazycdripper.core.models import AlbumRipReport
+        mp3_d = Path("/tmp/Artist - Album [MP3]")
+        rep = AlbumRipReport(
+            album_title="Album",
+            artist="Artist",
+            mp3_directory=mp3_d,
+            mp3_size_bytes=1000,
+        )
+        self.assertEqual(rep.mp3_directory, mp3_d)
+        self.assertEqual(rep.aac_directory, mp3_d)
+        self.assertEqual(rep.mp3_size_bytes, 1000)
+        self.assertEqual(rep.aac_size_bytes, 1000)
 
 
 if __name__ == "__main__":

@@ -26,7 +26,7 @@ ProgressCallback = Callable[[RipProgress], None]
 
 
 class RipPipelineOrchestrator:
-    """Coordinates the entire CD ripping lifecycle from optical disc to finished FLAC and AAC libraries."""
+    """Coordinates the entire CD ripping lifecycle from optical disc to finished FLAC and MP3 libraries."""
 
     def __init__(
         self,
@@ -59,13 +59,13 @@ class RipPipelineOrchestrator:
         on_progress: Optional[ProgressCallback] = None,
     ) -> AlbumRipReport:
         """
-        Execute full album extraction, dual-encoding (FLAC + AAC), and tagging.
+        Execute full album extraction, dual-encoding (FLAC + MP3), and tagging.
         Returns a comprehensive AlbumRipReport audit.
         """
         if not getattr(self.encoder, "is_available", False):
             raise RuntimeError(
-                "FFmpeg is required to encode audio files to FLAC and AAC, but was not found. "
-                "Please ensure FFmpeg is available or internet access is enabled for automatic setup."
+                "An audio encoder (FLAC/LAME or FFmpeg) is required to encode audio files to FLAC and MP3, but was not found. "
+                "Please ensure encoders are available."
             )
 
         start_time = time.time()
@@ -75,11 +75,11 @@ class RipPipelineOrchestrator:
         flac_album_dir = base_output_dir / format_album_directory_name(
             album.artist, album.title, album.year, AudioFormat.FLAC
         )
-        aac_album_dir = base_output_dir / format_album_directory_name(
-            album.artist, album.title, album.year, AudioFormat.AAC
+        mp3_album_dir = base_output_dir / format_album_directory_name(
+            album.artist, album.title, album.year, AudioFormat.MP3
         )
         flac_album_dir.mkdir(parents=True, exist_ok=True)
-        aac_album_dir.mkdir(parents=True, exist_ok=True)
+        mp3_album_dir.mkdir(parents=True, exist_ok=True)
 
         # 2. Save companion cover.jpg if artwork is cached
         cover_path = album.selected_artwork.local_cache_path if album.selected_artwork else None
@@ -90,10 +90,10 @@ class RipPipelineOrchestrator:
                 disc_numbers = sorted(list({t.disc_number for t in album.tracks})) or [1]
                 for d_num in disc_numbers:
                     self.tagger.save_companion_cover(flac_album_dir / f"Disc {d_num:02d}", cover_path)
-                    self.tagger.save_companion_cover(aac_album_dir / f"Disc {d_num:02d}", cover_path)
+                    self.tagger.save_companion_cover(mp3_album_dir / f"Disc {d_num:02d}", cover_path)
             else:
                 self.tagger.save_companion_cover(flac_album_dir, cover_path)
-                self.tagger.save_companion_cover(aac_album_dir, cover_path)
+                self.tagger.save_companion_cover(mp3_album_dir, cover_path)
 
         track_reports = []
         total_tracks = len(album.tracks)
@@ -205,12 +205,12 @@ class RipPipelineOrchestrator:
                     track_artist=track.artist,
                 )
 
-                aac_dest = get_target_track_path(
+                mp3_dest = get_target_track_path(
                     base_output_dir=base_output_dir,
                     artist=album.artist,
                     album=album.title,
                     year=album.year,
-                    audio_format=AudioFormat.AAC,
+                    audio_format=AudioFormat.MP3,
                     track_number=track.track_number,
                     track_title=track.title,
                     disc_number=track.disc_number,
@@ -228,18 +228,18 @@ class RipPipelineOrchestrator:
                             total_tracks=total_tracks,
                             track_percent=100.0,
                             overall_percent=(idx / total_tracks) * 100.0,
-                            status_message="Transcoding: Lossless FLAC + 256k AAC...",
+                            status_message="Transcoding: Lossless FLAC + 320k MP3...",
                             read_retries=overall_retries,
                             unrecoverable_errors=overall_errors,
                             jitter_corrections=overall_jitter,
                             track_title=track.title,
                         ))
 
-                    # B. Parallel Dual-Transcode (FLAC + AAC)
-                    flac_ok, aac_ok = self.encoder.encode_dual(
+                    # B. Parallel Dual-Transcode (FLAC + MP3)
+                    flac_ok, mp3_ok = self.encoder.encode_dual(
                         input_wav=scratch_wav,
                         output_flac=flac_dest,
-                        output_aac=aac_dest,
+                        output_lossy=mp3_dest,
                     )
 
                     flac_valid = (
@@ -247,18 +247,18 @@ class RipPipelineOrchestrator:
                         and flac_dest.exists()
                         and flac_dest.stat().st_size > 4096
                     )
-                    aac_valid = (
-                        aac_ok
-                        and aac_dest.exists()
-                        and aac_dest.stat().st_size > 4096
+                    mp3_valid = (
+                        mp3_ok
+                        and mp3_dest.exists()
+                        and mp3_dest.stat().st_size > 4096
                     )
 
-                    if not flac_valid or not aac_valid:
+                    if not flac_valid or not mp3_valid:
                         logger.error(
-                            "Encoding failed for Track %d: FLAC valid=%s, AAC valid=%s",
+                            "Encoding failed for Track %d: FLAC valid=%s, MP3 valid=%s",
                             track.track_number,
                             flac_valid,
-                            aac_valid,
+                            mp3_valid,
                         )
                         track_status = "failed"
                         track_errors += 1
@@ -277,7 +277,7 @@ class RipPipelineOrchestrator:
                             ))
 
                     # C. Metadata & Artwork Tagging (only for valid files)
-                    if flac_valid or aac_valid:
+                    if flac_valid or mp3_valid:
                         if on_progress:
                             on_progress(RipProgress(
                                 current_track=track.track_number,
@@ -299,12 +299,12 @@ class RipPipelineOrchestrator:
                             audio_format=AudioFormat.FLAC,
                             cover_image_path=cover_path,
                         )
-                    if aac_valid:
+                    if mp3_valid:
                         self.tagger.tag_track(
-                            file_path=aac_dest,
+                            file_path=mp3_dest,
                             track=track,
                             album=album,
-                            audio_format=AudioFormat.AAC,
+                            audio_format=AudioFormat.MP3,
                             cover_image_path=cover_path,
                         )
 
@@ -336,7 +336,8 @@ class RipPipelineOrchestrator:
                         read_retries=track_retries,
                         unrecoverable_errors=track_errors,
                         flac_path=flac_dest if flac_dest.exists() else None,
-                        aac_path=aac_dest if aac_dest.exists() else None,
+                        mp3_path=mp3_dest if mp3_dest.exists() else None,
+                        aac_path=mp3_dest if mp3_dest.exists() else None,
                     )
                 )
 
@@ -356,7 +357,7 @@ class RipPipelineOrchestrator:
 
         # Calculate library directory sizes
         flac_size = sum(f.stat().st_size for f in flac_album_dir.rglob("*") if f.is_file()) if flac_album_dir.exists() else 0
-        aac_size = sum(f.stat().st_size for f in aac_album_dir.rglob("*") if f.is_file()) if aac_album_dir.exists() else 0
+        mp3_size = sum(f.stat().st_size for f in mp3_album_dir.rglob("*") if f.is_file()) if mp3_album_dir.exists() else 0
 
         elapsed = time.time() - start_time
 
@@ -372,8 +373,10 @@ class RipPipelineOrchestrator:
             duration_seconds=elapsed,
             destination_directory=base_output_dir if successful_tracks > 0 else None,
             flac_directory=flac_album_dir if successful_tracks > 0 else None,
-            aac_directory=aac_album_dir if successful_tracks > 0 else None,
+            mp3_directory=mp3_album_dir if successful_tracks > 0 else None,
+            aac_directory=mp3_album_dir if successful_tracks > 0 else None,
             flac_size_bytes=flac_size,
-            aac_size_bytes=aac_size,
+            mp3_size_bytes=mp3_size,
+            aac_size_bytes=mp3_size,
             track_reports=track_reports,
         )

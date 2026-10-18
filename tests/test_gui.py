@@ -120,13 +120,13 @@ class TestGuiThemeAndContent(unittest.TestCase):
             total_tracks=10,
             track_percent=100.0,
             overall_percent=20.0,
-            status_message="Transcoding: Lossless FLAC + 256k AAC...",
+            status_message="Transcoding: Lossless FLAC + 320k MP3...",
         )
         view.update_progress(prog_encode)
         if hasattr(view, "headline"):
             self.assertEqual(view.headline.text(), "Track 2 of 10")
             self.assertEqual(view.track_label.text(), "Transcoding")
-            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + AAC")
+            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + MP3")
 
         # Test tagging progress state
         prog_tag = RipProgress(
@@ -163,14 +163,14 @@ class TestGuiThemeAndContent(unittest.TestCase):
             total_tracks=10,
             track_percent=100.0,
             overall_percent=20.0,
-            status_message="Transcoding: Lossless FLAC + 256k AAC...",
+            status_message="Transcoding: Lossless FLAC + 320k MP3...",
             track_title="Something",
         )
         view.update_progress(prog_named_enc)
         if hasattr(view, "headline"):
             self.assertEqual(view.headline.text(), 'Track 2 of 10: "Something"')
             self.assertEqual(view.track_label.text(), "Transcoding")
-            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + AAC")
+            self.assertEqual(view.status_sub.text(), "Encoding  •  Lossless FLAC + MP3")
 
         # Test track title resolution via AlbumInfo set_album
         from lazycdripper.core.models import AlbumInfo, TrackInfo
@@ -464,9 +464,9 @@ class TestTrackTableWidget(unittest.TestCase):
             policy_labels = window.findChildren(QLabel, "policyCard")
             self.assertEqual(len(policy_labels), 1)
             text = policy_labels[0].text()
-            self.assertIn("Mode 5", text)
+            self.assertIn("320k", text)
             self.assertIn("Level 8", text)
-            self.assertIn("FDK-AAC", text)
+            self.assertIn("LAME", text)
             self.assertIn("Perfect CD copy", text)
             self.assertIn("Compressed but still great", text)
             self.assertIn("bit-perfect", text)
@@ -558,7 +558,7 @@ class TestTrackTableWidget(unittest.TestCase):
             self.assertIn("Querying MusicBrainz", window.album_source_label.text())
             self.assertEqual(window.track_table.table.rowCount(), 1)
             self.assertFalse(window.btn_rip.isEnabled())
-            self.assertEqual(window.btn_rip.text(), "Rip to FLAC + AAC")
+            self.assertEqual(window.btn_rip.text(), "Rip to FLAC + MP3")
 
             # 2. Trigger _on_metadata_resolved (online metadata lock & ready to rip)
             full = AlbumInfo(
@@ -573,7 +573,7 @@ class TestTrackTableWidget(unittest.TestCase):
             self.assertEqual(window.album_artist_label.text(), "COLDPLAY")
             self.assertIn("MusicBrainz", window.album_source_label.text())
             self.assertTrue(window.btn_rip.isEnabled())
-            self.assertEqual(window.btn_rip.text(), "Rip to FLAC + AAC")
+            self.assertEqual(window.btn_rip.text(), "Rip to FLAC + MP3")
 
     def test_artwork_card_widget_alignment(self):
         from lazycdripper.gui.widgets.artwork_card import ArtworkCardWidget, HAVE_QT
@@ -933,9 +933,9 @@ class TestTrackTableWidget(unittest.TestCase):
             duration_seconds=120.0,
             destination_directory=Path("/tmp/rip"),
             flac_directory=Path("/tmp/rip/Artist - Album [FLAC]"),
-            aac_directory=Path("/tmp/rip/Artist - Album [AAC]"),
+            mp3_directory=Path("/tmp/rip/Artist - Album [MP3]"),
             flac_size_bytes=50 * 1024 * 1024,
-            aac_size_bytes=15 * 1024 * 1024,
+            mp3_size_bytes=15 * 1024 * 1024,
             track_reports=[
                 TrackRipReport(track_number=1, title="T1", status="pristine"),
                 TrackRipReport(track_number=2, title="T2", status="pristine"),
@@ -953,11 +953,13 @@ class TestTrackTableWidget(unittest.TestCase):
         self.assertFalse(hasattr(view, "defect_card"))
         self.assertTrue(view.output_card.isVisible())
         self.assertIn("Artist - Album [FLAC] - Perfect CD copy", view.flac_dir_label.text())
-        self.assertIn("Artist - Album [AAC] - Compressed but still great", view.aac_dir_label.text())
+        self.assertIn("Artist - Album [MP3] - Compressed but still great", view.mp3_dir_label.text())
+        self.assertIn("Artist - Album [MP3] - Compressed but still great", view.aac_dir_label.text())
         self.assertIn("50.0 MB", view.flac_dir_label.text())
         self.assertEqual(view.track_label.alignment(), Qt.AlignCenter)
         self.assertEqual(view.overall_label.alignment(), Qt.AlignCenter)
         self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignCenter)
         self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignCenter)
         self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
         # Sloth completion mascot is displayed in place of transport disc
@@ -1149,6 +1151,7 @@ class TestTrackTableWidget(unittest.TestCase):
         view.show_completion(rep)
         self.assertEqual(view.status_sub.alignment(), Qt.AlignCenter)
         self.assertEqual(view.flac_dir_label.alignment(), Qt.AlignCenter)
+        self.assertEqual(view.mp3_dir_label.alignment(), Qt.AlignCenter)
         self.assertEqual(view.aac_dir_label.alignment(), Qt.AlignCenter)
 
     def test_window_custom_size_preserved_across_transitions(self):

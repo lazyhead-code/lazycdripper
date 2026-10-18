@@ -9,7 +9,8 @@ from typing import List, Optional
 class AudioFormat(str, Enum):
     """Supported target audio encoding formats."""
     FLAC = "flac"
-    AAC = "aac"
+    MP3 = "mp3"
+    AAC = "aac"  # Legacy / alias support
 
 
 @dataclass
@@ -86,10 +87,15 @@ class TrackRipReport:
     read_retries: int = 0
     unrecoverable_errors: int = 0
     flac_path: Optional[Path] = None
+    mp3_path: Optional[Path] = None
     aac_path: Optional[Path] = None
     read_errors: Optional[int] = None
 
     def __post_init__(self) -> None:
+        if self.mp3_path is None and self.aac_path is not None:
+            self.mp3_path = self.aac_path
+        elif self.aac_path is None and self.mp3_path is not None:
+            self.aac_path = self.mp3_path
         if self.read_errors is not None and self.unrecoverable_errors == 0:
             self.unrecoverable_errors = self.read_errors
         elif self.read_errors is None:
@@ -113,18 +119,32 @@ class AlbumRipReport:
     duration_seconds: float = 0.0
     destination_directory: Optional[Path] = None
     flac_directory: Optional[Path] = None
+    mp3_directory: Optional[Path] = None
     aac_directory: Optional[Path] = None
     flac_size_bytes: int = 0
+    mp3_size_bytes: int = 0
     aac_size_bytes: int = 0
     track_reports: List[TrackRipReport] = field(default_factory=list)
 
+    def __post_init__(self) -> None:
+        if self.mp3_directory is None and self.aac_directory is not None:
+            self.mp3_directory = self.aac_directory
+        elif self.aac_directory is None and self.mp3_directory is not None:
+            self.aac_directory = self.mp3_directory
+        if self.mp3_size_bytes == 0 and self.aac_size_bytes > 0:
+            self.mp3_size_bytes = self.aac_size_bytes
+        elif self.aac_size_bytes == 0 and self.mp3_size_bytes > 0:
+            self.aac_size_bytes = self.mp3_size_bytes
+
     @property
     def rip_folder(self) -> Optional[Path]:
-        """Parent directory containing the ripped FLAC and AAC libraries."""
+        """Parent directory containing the ripped FLAC and MP3 libraries."""
         if self.destination_directory and self.destination_directory.exists():
             return self.destination_directory
         if self.flac_directory and self.flac_directory.parent.exists():
             return self.flac_directory.parent
+        if self.mp3_directory and self.mp3_directory.parent.exists():
+            return self.mp3_directory.parent
         if self.aac_directory and self.aac_directory.parent.exists():
             return self.aac_directory.parent
         return None

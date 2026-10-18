@@ -30,7 +30,7 @@ Buying a music CD and listening to the whole album brings back the magic.
 
 We don't have CD drives in cars and laptops anymore. But we can rip music for ourselves (all it takes is an external drive), copy it to our phone, and have the exact same experience.
 
-This application is opinionated AF, but it rips to virtually the best options: high-quality AAC and FLAC. Why AAC instead of MP3? Because modern Bluetooth headphones use AAC natively; using a lossy codec from a different family is not optimal. Why FLAC? Because it's a picture-perfect copy of your CD—highest possible quality. We may not really hear the difference much, but I'm glad to surrender to an illusion :)
+This application is opinionated AF, but it rips to virtually the best options: high-quality MP3 (320 kbps CBR) and FLAC. Why MP3 instead of other lossy formats? Because MP3 is 100% patent-free worldwide, universally supported by every car, stereo, and device on Earth, and at 320 kbps CBR it is perceptually transparent. Why FLAC? Because it's a picture-perfect copy of your CD—highest possible quality. We may not really hear the difference much, but I'm glad to surrender to an illusion :)
 
 Have fun and welcome back to the magical world of music!
 

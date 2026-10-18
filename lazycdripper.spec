@@ -76,6 +76,7 @@ hiddenimports = [
     "mutagen.flac",
     "mutagen.mp4",
     "mutagen.id3",
+    "mutagen.mp3",
     "musicbrainzngs",
     "PySide6.QtCore",
     "PySide6.QtGui",

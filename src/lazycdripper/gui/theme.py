@@ -109,7 +109,7 @@ QPushButton#btnIconRefresh:pressed {{
     color: {COLOR_AMBER_DARK};
 }}
 
-/* Primary Action Button ("Rip to FLAC + AAC" — Precision Machined Amber Glow) */
+/* Primary Action Button ("Rip to FLAC + MP3" — Precision Machined Amber Glow) */
 QPushButton#primaryRipButton {{
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFAE57, stop:1 #E08528);
     color: #0C0C0F;

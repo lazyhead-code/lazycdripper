@@ -85,7 +85,14 @@ def format_track_filename(
     - Title only (number=False, artist=False): '<Track Title>.<ext>'
     """
     clean_title = sanitize_filename(title, fallback="Track")
-    ext = "flac" if audio_format == AudioFormat.FLAC else "m4a"
+    if audio_format == AudioFormat.FLAC:
+        ext = "flac"
+    elif audio_format == AudioFormat.MP3:
+        ext = "mp3"
+    elif audio_format == AudioFormat.AAC:
+        ext = "m4a"
+    else:
+        ext = audio_format.value
 
     parts = []
     if include_track_number:

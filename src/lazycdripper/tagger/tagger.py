@@ -1,4 +1,4 @@
-"""Audio tagging engine handling Vorbis comments, MP4 atoms, and artwork embedding."""
+"""Audio tagging engine handling Vorbis comments, ID3v2.3 tags, MP4 atoms, and artwork embedding."""
 
 import logging
 from pathlib import Path
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class AudioTagger:
-    """Writes metadata and embeds cover art into FLAC and AAC audio files."""
+    """Writes metadata and embeds cover art into FLAC, MP3, and AAC audio files."""
 
     def __init__(self):
         self._has_mutagen: Optional[bool] = None
@@ -46,6 +46,8 @@ class AudioTagger:
 
         if audio_format == AudioFormat.FLAC:
             return self._tag_flac(file_path, track, album, cover_image_path)
+        elif audio_format == AudioFormat.MP3:
+            return self._tag_mp3(file_path, track, album, cover_image_path)
         elif audio_format == AudioFormat.AAC:
             return self._tag_m4a(file_path, track, album, cover_image_path)
         return False
@@ -109,6 +111,70 @@ class AudioTagger:
             return True
         except Exception as err:
             logger.error("Failed to tag FLAC file %s: %s", file_path, err)
+            return False
+
+    def _tag_mp3(
+        self,
+        file_path: Path,
+        track: TrackInfo,
+        album: AlbumInfo,
+        cover_image_path: Optional[Path] = None,
+    ) -> bool:
+        """Inject ID3v2.3 tags and cover art into an .mp3 file."""
+        try:
+            from mutagen.id3 import (
+                ID3,
+                APIC,
+                TALB,
+                TCON,
+                TIT2,
+                TPE1,
+                TPE2,
+                TPOS,
+                TRCK,
+                TXXX,
+                TYER,
+                ID3NoHeaderError,
+            )
+
+            try:
+                tags = ID3(str(file_path))
+            except ID3NoHeaderError:
+                tags = ID3()
+
+            tags.add(TIT2(encoding=3, text=[track.title]))
+            tags.add(TPE1(encoding=3, text=[track.artist]))
+            tags.add(TPE2(encoding=3, text=[album.album_artist or album.artist]))
+            tags.add(TALB(encoding=3, text=[album.title]))
+
+            total_tracks = album.total_tracks or len(album.tracks)
+            tags.add(TRCK(encoding=3, text=[f"{track.track_number}/{total_tracks}"]))
+            tags.add(TPOS(encoding=3, text=[f"{track.disc_number}/{album.total_discs}"]))
+
+            if album.year:
+                tags.add(TYER(encoding=3, text=[str(album.year)]))
+            if album.genre:
+                tags.add(TCON(encoding=3, text=[album.genre]))
+            if album.disc_id:
+                tags.add(TXXX(encoding=3, desc="MusicBrainz DiscID", text=[album.disc_id]))
+
+            if cover_image_path and cover_image_path.exists():
+                image_data = cover_image_path.read_bytes()
+                mime = "image/png" if image_data.startswith(b"\x89PNG\r\n\x1a\n") else "image/jpeg"
+                tags.add(
+                    APIC(
+                        encoding=3,
+                        mime=mime,
+                        type=3,  # Front cover
+                        desc="Front Cover",
+                        data=image_data,
+                    )
+                )
+
+            tags.save(str(file_path), v2_version=3)
+            return True
+        except Exception as err:
+            logger.error("Failed to tag MP3 file %s: %s", file_path, err)
             return False
 
     def _tag_m4a(

@@ -156,17 +156,19 @@ class CompletionDialog(QDialog if HAVE_QT else object):
             output_box.setSpacing(8)
 
             flac_mb = self.report.flac_size_bytes / (1024 * 1024)
-            aac_mb = self.report.aac_size_bytes / (1024 * 1024)
+            mp3_bytes = self.report.mp3_size_bytes or self.report.aac_size_bytes
+            mp3_dir = self.report.mp3_directory or self.report.aac_directory
+            mp3_mb = mp3_bytes / (1024 * 1024)
 
             flac_title = self.report.flac_directory.name if self.report.flac_directory else "[FLAC]"
-            aac_title = self.report.aac_directory.name if self.report.aac_directory else "[AAC]"
+            mp3_title = mp3_dir.name if mp3_dir else "[MP3]"
             flac_label = QLabel(f"📁  {flac_title} - Perfect CD copy ({flac_mb:.1f} MB)")
             flac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
             output_box.addWidget(flac_label)
 
-            aac_label = QLabel(f"📁  {aac_title} - Compressed but still great ({aac_mb:.1f} MB)")
-            aac_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
-            output_box.addWidget(aac_label)
+            mp3_label = QLabel(f"📁  {mp3_title} - Compressed but still great ({mp3_mb:.1f} MB)")
+            mp3_label.setStyleSheet("color: #F3F4F6; font-size: 12px; font-weight: 600;")
+            output_box.addWidget(mp3_label)
 
             main_layout.addLayout(output_box)
         else:

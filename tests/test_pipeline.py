@@ -87,15 +87,16 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
             self.assertTrue((expected_flac_dir / "02 - Welcome to the Machine.flac").exists())
             self.assertTrue((expected_flac_dir / "cover.jpg").exists())
 
-            # 3. Verify AAC sister library folder & files
-            expected_aac_dir = base_output / "Pink Floyd - Wish You Were Here (1975) [AAC]"
-            self.assertTrue(expected_aac_dir.exists())
-            self.assertTrue((expected_aac_dir / "01 - Shine On You Crazy Diamond (Pts. 1-5).m4a").exists())
-            self.assertTrue((expected_aac_dir / "02 - Welcome to the Machine.m4a").exists())
-            self.assertTrue((expected_aac_dir / "cover.jpg").exists())
+            # 3. Verify MP3 sister library folder & files
+            expected_mp3_dir = base_output / "Pink Floyd - Wish You Were Here (1975) [MP3]"
+            self.assertTrue(expected_mp3_dir.exists())
+            self.assertTrue((expected_mp3_dir / "01 - Shine On You Crazy Diamond (Pts. 1-5).mp3").exists())
+            self.assertTrue((expected_mp3_dir / "02 - Welcome to the Machine.mp3").exists())
+            self.assertTrue((expected_mp3_dir / "cover.jpg").exists())
 
             # 4. Verify directory sizes tracked in report
             self.assertGreater(report.flac_size_bytes, 0)
+            self.assertGreater(report.mp3_size_bytes, 0)
             self.assertGreater(report.aac_size_bytes, 0)
 
     def test_execute_rip_multi_disc_companion_cover(self):
@@ -138,15 +139,15 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
 
             self.assertIsNotNone(report)
             expected_flac_dir = base_output / "Tedeschi Trucks Band - Everybody's Talkin' (2012) [FLAC]"
-            expected_aac_dir = base_output / "Tedeschi Trucks Band - Everybody's Talkin' (2012) [AAC]"
+            expected_mp3_dir = base_output / "Tedeschi Trucks Band - Everybody's Talkin' (2012) [MP3]"
 
             # Verify cover.jpg is inside Disc 01 subfolders
             self.assertTrue((expected_flac_dir / "Disc 01" / "cover.jpg").exists())
-            self.assertTrue((expected_aac_dir / "Disc 01" / "cover.jpg").exists())
+            self.assertTrue((expected_mp3_dir / "Disc 01" / "cover.jpg").exists())
 
             # Verify cover.jpg is NOT placed directly in parent album folders
             self.assertFalse((expected_flac_dir / "cover.jpg").exists())
-            self.assertFalse((expected_aac_dir / "cover.jpg").exists())
+            self.assertFalse((expected_mp3_dir / "cover.jpg").exists())
 
     def test_album_rip_report_status_degraded(self):
         # Test headline badges for damaged or recovered discs
@@ -229,6 +230,7 @@ class TestRipPipelineOrchestrator(unittest.TestCase):
             self.assertEqual(report.summary_headline, "🔴 Extraction Failed — Drive Read Error")
             self.assertIn("Failed to extract audio tracks", report.human_readable_summary)
             self.assertIsNone(report.flac_directory)
+            self.assertIsNone(report.mp3_directory)
             self.assertIsNone(report.aac_directory)
             self.assertEqual(len(report.track_reports), 2)
             self.assertEqual(report.track_reports[0].status, "failed")

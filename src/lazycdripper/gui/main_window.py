@@ -470,13 +470,13 @@ class MainWindow(QMainWindow if HAVE_QT else object):
         left_deck.addStretch()
 
         # The Master Rip Switch: Large Glowing Amber Push Button
-        self.btn_rip = QPushButton("Rip to FLAC + AAC")
+        self.btn_rip = QPushButton("Rip to FLAC + MP3")
         self.btn_rip.setObjectName("primaryRipButton")
         self.btn_rip.setEnabled(False)
         self.btn_rip.clicked.connect(lambda: self._start_rip())
         left_deck.addWidget(self.btn_rip)
 
-        # Precision Output Specification Plaque (Dual FLAC + AAC)
+        # Precision Output Specification Plaque (Dual FLAC + MP3)
         policy_note = QLabel(
             "<table width='100%' cellpadding='0' cellspacing='0' style='border: none;'>"
             "<tr>"
@@ -492,10 +492,10 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             "<tr>"
             "<td width='12' valign='top' style='color: #FF9E3B; font-size: 8px; padding-top: 2px;'>●</td>"
             "<td>"
-            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>AAC LOSSY (Compressed but still great)</div>"
+            "<div style='color: #E2E1E6; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;'>MP3 320k (Compressed but still great)</div>"
             "<div style='color: #8E8D96; font-size: 9px; margin-top: 3px; line-height: 1.35;'>"
-            "Fraunhofer FDK-AAC (VBR Mode 5 / 256k in .m4a).<br>"
-            "Native Bluetooth codec (avoids cross-codec transcode artifacts)."
+            "LAME MP3 (320 kbps CBR / Quality 0 in .mp3).<br>"
+            "100% patent-free, universal hardware playback."
             "</div>"
             "</td>"
             "</tr>"
@@ -839,16 +839,16 @@ class MainWindow(QMainWindow if HAVE_QT else object):
             if not getattr(self.orchestrator.encoder, "is_available", False):
                 QMessageBox.critical(
                     self,
-                    "FFmpeg Audio Encoder Required",
-                    "FFmpeg is required to encode audio into FLAC and AAC, but could not be located.\n\n"
-                    "Please install FFmpeg or ensure internet access for automated download.",
+                    "Audio Encoder Required",
+                    "An audio encoder (FLAC/LAME or FFmpeg) is required to encode audio into FLAC and MP3, but could not be located.\n\n"
+                    "Please ensure encoders are available or internet access is enabled for automated setup.",
                 )
                 return
 
         default_dir = self.last_destination_dir or str(Path.home() / "Music")
         folder = QFileDialog.getExistingDirectory(
             self,
-            "Choose Destination Folder for [FLAC] and [AAC] Archives",
+            "Choose Destination Folder for [FLAC] and [MP3] Archives",
             default_dir,
         )
         if not folder:

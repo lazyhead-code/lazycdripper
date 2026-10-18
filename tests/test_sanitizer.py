@@ -40,6 +40,9 @@ class TestSanitizer(unittest.TestCase):
         flac_dir = format_album_directory_name("Pink Floyd", "Animals", 1977, AudioFormat.FLAC)
         self.assertEqual(flac_dir, "Pink Floyd - Animals (1977) [FLAC]")
 
+        mp3_dir = format_album_directory_name("Miles Davis", "Kind of Blue", 1959, AudioFormat.MP3)
+        self.assertEqual(mp3_dir, "Miles Davis - Kind of Blue (1959) [MP3]")
+
         aac_dir = format_album_directory_name("Miles Davis", "Kind of Blue", 1959, AudioFormat.AAC)
         self.assertEqual(aac_dir, "Miles Davis - Kind of Blue (1959) [AAC]")
 
@@ -49,6 +52,7 @@ class TestSanitizer(unittest.TestCase):
 
     def test_format_track_filename_defaults(self):
         self.assertEqual(format_track_filename(1, "Speak to Me", AudioFormat.FLAC), "01 - Speak to Me.flac")
+        self.assertEqual(format_track_filename(2, "Breathe", AudioFormat.MP3), "02 - Breathe.mp3")
         self.assertEqual(format_track_filename(12, "Brain Damage", AudioFormat.AAC), "12 - Brain Damage.m4a")
 
     def test_format_track_filename_with_artist(self):
@@ -149,6 +153,27 @@ class TestSanitizer(unittest.TestCase):
             / "The Smashing Pumpkins - Mellon Collie and the Infinite Sadness (1995) [AAC]"
             / "Disc 01"
             / "01 - Tonight, Tonight.m4a"
+        )
+        self.assertEqual(path, expected)
+
+    def test_get_target_track_path_multi_disc_mp3(self):
+        base = Path("/Music")
+        path = get_target_track_path(
+            base_output_dir=base,
+            artist="The Smashing Pumpkins",
+            album="Mellon Collie and the Infinite Sadness",
+            year=1995,
+            audio_format=AudioFormat.MP3,
+            track_number=1,
+            track_title="Tonight, Tonight",
+            disc_number=1,
+            total_discs=2,
+        )
+        expected = (
+            base
+            / "The Smashing Pumpkins - Mellon Collie and the Infinite Sadness (1995) [MP3]"
+            / "Disc 01"
+            / "01 - Tonight, Tonight.mp3"
         )
         self.assertEqual(path, expected)
 
